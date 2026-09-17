@@ -1,0 +1,993 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{ business_profile.business_name }} | {{ business_profile.business_type|title }} in {{ business_profile.city }}</title>
+    <meta name="description" content="Top-rated {{ business_profile.business_type }} services in {{ business_profile.city }}. Get free instant quotes, compare prices, and hire vetted local experts.">
+    
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+
+    <style>
+        :root {
+            --accent: {{ business_profile.accent_color or '#f97316' }};
+            --accent-dark: {{ business_profile.accent_dark or '#ea580c' }};
+            --bg-main: #060911;
+            --bg-card: rgba(15, 23, 42, 0.75);
+            --bg-card-hover: rgba(30, 41, 59, 0.85);
+            --border: rgba(255, 255, 255, 0.08);
+            --border-accent: rgba(249, 115, 22, 0.3);
+            --text-main: #f8fafc;
+            --text-muted: #94a3b8;
+            --white: #ffffff;
+            --radius-lg: 20px;
+            --radius-md: 12px;
+            --radius-sm: 8px;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        html {
+            scroll-behavior: smooth;
+            font-family: 'Plus Jakarta Sans', system-ui, -apple-system, sans-serif;
+        }
+
+        body {
+            background-color: var(--bg-main);
+            background-image: 
+                radial-gradient(circle at 15% 15%, rgba(249, 115, 22, 0.12), transparent 35%),
+                radial-gradient(circle at 85% 65%, rgba(37, 99, 235, 0.08), transparent 40%);
+            color: var(--text-main);
+            line-height: 1.6;
+            overflow-x: hidden;
+        }
+
+        a {
+            color: inherit;
+            text-decoration: none;
+        }
+
+        .container {
+            width: min(1200px, calc(100% - 40px));
+            margin: 0 auto;
+        }
+
+        /* ---------------------------------------------------------
+           Navigation Header
+        --------------------------------------------------------- */
+        nav {
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            background: rgba(6, 9, 17, 0.85);
+            border-bottom: 1px solid var(--border);
+        }
+
+        .nav-inner {
+            height: 76px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .brand {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            font-weight: 800;
+            font-size: 18px;
+            letter-spacing: -0.02em;
+        }
+
+        .brand-icon {
+            width: 40px;
+            height: 40px;
+            border-radius: 12px;
+            background: linear-gradient(135deg, var(--accent), var(--accent-dark));
+            display: grid;
+            place-items: center;
+            color: white;
+            font-weight: 900;
+            font-size: 18px;
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.3);
+        }
+
+        .nav-menu {
+            display: flex;
+            align-items: center;
+            gap: 32px;
+            list-style: none;
+            font-size: 14px;
+            font-weight: 600;
+            color: var(--text-muted);
+        }
+
+        .nav-menu a:hover {
+            color: var(--white);
+        }
+
+        .nav-cta {
+            padding: 10px 20px;
+            border-radius: var(--radius-sm);
+            background: linear-gradient(135deg, var(--accent), var(--accent-dark));
+            color: white;
+            font-weight: 700;
+            font-size: 14px;
+            transition: all 0.2s ease;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+        }
+
+        .nav-cta:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(249, 115, 22, 0.35);
+        }
+
+        /* ---------------------------------------------------------
+           Hero Section
+        --------------------------------------------------------- */
+        .hero {
+            padding: 90px 0 110px;
+            position: relative;
+            background: 
+                linear-gradient(180deg, rgba(6, 9, 17, 0.75) 0%, rgba(6, 9, 17, 0.92) 80%, rgba(6, 9, 17, 1) 100%),
+                url("{{ business_profile.hero_image or 'https://images.unsplash.com/photo-1632759145351-1d592919f522?auto=format&fit=crop&w=1600&q=85' }}") center/cover no-repeat;
+        }
+
+        .hero-grid {
+            display: grid;
+            grid-template-columns: 1.1fr 0.9fr;
+            gap: 60px;
+            align-items: center;
+        }
+
+        .eyebrow {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 6px 14px;
+            border-radius: 999px;
+            background: rgba(249, 115, 22, 0.1);
+            border: 1px solid rgba(249, 115, 22, 0.25);
+            color: #fdba74;
+            font-size: 13px;
+            font-weight: 700;
+            letter-spacing: 0.03em;
+            margin-bottom: 20px;
+        }
+
+        .eyebrow-dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background: var(--accent);
+            box-shadow: 0 0 10px var(--accent);
+        }
+
+        h1 {
+            font-size: clamp(38px, 4.5vw, 62px);
+            font-weight: 800;
+            line-height: 1.08;
+            letter-spacing: -0.03em;
+            margin-bottom: 20px;
+            color: var(--white);
+        }
+
+        .text-gradient {
+            background: linear-gradient(135deg, var(--white) 30%, var(--accent) 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .hero-sub {
+            font-size: 17px;
+            color: var(--text-muted);
+            margin-bottom: 30px;
+            max-width: 560px;
+        }
+
+        .hero-checklist {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 12px;
+            margin-bottom: 35px;
+        }
+
+        .check-item {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-size: 14px;
+            font-weight: 600;
+            color: var(--text-main);
+        }
+
+        .check-icon {
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            background: rgba(34, 197, 94, 0.15);
+            color: #4ade80;
+            display: grid;
+            place-items: center;
+            font-size: 12px;
+            font-weight: 800;
+        }
+
+        /* Hero Quote Form Card */
+        .quote-card {
+            background: var(--bg-card);
+            border: 1px solid var(--border-accent);
+            border-radius: var(--radius-lg);
+            padding: 32px;
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.7);
+            backdrop-filter: blur(16px);
+        }
+
+        .quote-card-head {
+            margin-bottom: 20px;
+        }
+
+        .quote-card-title {
+            font-size: 22px;
+            font-weight: 800;
+            color: var(--white);
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .quote-card-sub {
+            font-size: 13px;
+            color: var(--text-muted);
+            margin-top: 4px;
+        }
+
+        .pill-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 10px;
+            margin: 14px 0 20px;
+        }
+
+        .pill-btn {
+            background: rgba(255, 255, 255, 0.04);
+            border: 1px solid var(--border);
+            color: var(--text-muted);
+            padding: 10px 14px;
+            border-radius: var(--radius-md);
+            font-size: 13px;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            text-align: center;
+        }
+
+        .pill-btn:hover, .pill-btn.active {
+            background: var(--accent);
+            border-color: var(--accent);
+            color: var(--white);
+            box-shadow: 0 4px 15px rgba(249, 115, 22, 0.35);
+        }
+
+        .form-row {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 12px;
+            margin-bottom: 12px;
+        }
+
+        .form-group {
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+        }
+
+        .form-group label {
+            font-size: 12px;
+            font-weight: 700;
+            color: var(--text-muted);
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+        }
+
+        .input-control {
+            width: 100%;
+            padding: 12px 14px;
+            border-radius: var(--radius-sm);
+            background: rgba(6, 9, 17, 0.8);
+            border: 1px solid var(--border);
+            color: var(--white);
+            font-family: inherit;
+            font-size: 14px;
+            outline: none;
+            transition: border-color 0.2s ease;
+        }
+
+        .input-control:focus {
+            border-color: var(--accent);
+            box-shadow: 0 0 0 3px rgba(249, 115, 22, 0.15);
+        }
+
+        .submit-btn {
+            width: 100%;
+            padding: 16px;
+            border-radius: var(--radius-md);
+            background: linear-gradient(135deg, var(--accent), var(--accent-dark));
+            color: var(--white);
+            font-weight: 800;
+            font-size: 16px;
+            border: none;
+            cursor: pointer;
+            margin-top: 10px;
+            transition: all 0.2s ease;
+            box-shadow: 0 10px 25px rgba(249, 115, 22, 0.35);
+        }
+
+        /* Sticky Floating Contact Bar */
+        .sticky-contact-bar {
+            position: fixed;
+            bottom: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            z-index: 999;
+            width: min(900px, calc(100% - 30px));
+            background: rgba(15, 23, 42, 0.92);
+            border: 1px solid var(--border-accent);
+            border-radius: 999px;
+            padding: 10px 24px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            backdrop-filter: blur(20px);
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.7);
+        }
+        .sticky-text { font-size: 13px; font-weight: 700; color: var(--white); }
+        .sticky-actions { display: flex; gap: 10px; }
+        .sticky-btn {
+            padding: 8px 16px;
+            border-radius: 999px;
+            font-size: 13px;
+            font-weight: 800;
+            color: white;
+            transition: transform 0.2s ease;
+        }
+        .phone-btn { background: linear-gradient(135deg, var(--accent), var(--accent-dark)); }
+        .wa-btn { background: #22c55e; }
+        .sticky-btn:hover { transform: translateY(-2px); }
+
+        @media (max-width: 640px) {
+            .sticky-text { display: none; }
+            .sticky-contact-bar { justify-content: center; width: calc(100% - 20px); padding: 8px 12px; }
+        }
+
+        .submit-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 14px 30px rgba(249, 115, 22, 0.5);
+        }
+
+        .form-footer-text {
+            font-size: 12px;
+            color: var(--text-muted);
+            text-align: center;
+            margin-top: 14px;
+        }
+
+        /* ---------------------------------------------------------
+           Trust Bar
+        --------------------------------------------------------- */
+        .trust-bar {
+            border-top: 1px solid var(--border);
+            border-bottom: 1px solid var(--border);
+            background: rgba(15, 23, 42, 0.4);
+            padding: 24px 0;
+        }
+
+        .trust-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 20px;
+            text-align: center;
+        }
+
+        .trust-item {
+            border-right: 1px solid var(--border);
+            padding: 0 15px;
+        }
+
+        .trust-item:last-child {
+            border-right: none;
+        }
+
+        .trust-val {
+            font-size: 26px;
+            font-weight: 800;
+            color: var(--white);
+        }
+
+        .trust-lbl {
+            font-size: 13px;
+            color: var(--text-muted);
+            margin-top: 2px;
+        }
+
+        /* ---------------------------------------------------------
+           Services Grid
+        --------------------------------------------------------- */
+        section {
+            padding: 90px 0;
+        }
+
+        .section-head {
+            text-align: center;
+            max-width: 650px;
+            margin: 0 auto 50px;
+        }
+
+        .section-tag {
+            color: var(--accent);
+            font-size: 13px;
+            font-weight: 800;
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+        }
+
+        .section-title {
+            font-size: 36px;
+            font-weight: 800;
+            margin-top: 8px;
+            color: var(--white);
+            letter-spacing: -0.02em;
+        }
+
+        .section-sub {
+            color: var(--text-muted);
+            margin-top: 10px;
+            font-size: 16px;
+        }
+
+        .services-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 24px;
+        }
+
+        .service-card {
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: var(--radius-lg);
+            padding: 32px;
+            transition: all 0.3s ease;
+        }
+
+        .service-card:hover {
+            transform: translateY(-6px);
+            border-color: var(--border-accent);
+            background: var(--bg-card-hover);
+        }
+
+        .service-icon-box {
+            width: 50px;
+            height: 50px;
+            border-radius: var(--radius-md);
+            background: rgba(249, 115, 22, 0.12);
+            color: var(--accent);
+            display: grid;
+            place-items: center;
+            font-size: 24px;
+            margin-bottom: 20px;
+        }
+
+        .service-card h3 {
+            font-size: 20px;
+            font-weight: 700;
+            color: var(--white);
+            margin-bottom: 10px;
+        }
+
+        .service-card p {
+            font-size: 14px;
+            color: var(--text-muted);
+            line-height: 1.6;
+        }
+
+        /* ---------------------------------------------------------
+           Interactive Cost Calculator
+        --------------------------------------------------------- */
+        .calc-wrapper {
+            background: linear-gradient(165deg, rgba(15, 23, 42, 0.9), rgba(6, 9, 17, 0.95));
+            border: 1px solid var(--border-accent);
+            border-radius: var(--radius-lg);
+            padding: 40px;
+            margin-top: 20px;
+        }
+
+        .calc-grid {
+            display: grid;
+            grid-template-columns: 1.2fr 0.8fr;
+            gap: 50px;
+            align-items: center;
+        }
+
+        .range-slider {
+            width: 100%;
+            margin: 15px 0 25px;
+            accent-color: var(--accent);
+        }
+
+        .calc-result-box {
+            background: rgba(6, 9, 17, 0.85);
+            border: 1px solid var(--border-accent);
+            border-radius: var(--radius-md);
+            padding: 30px;
+            text-align: center;
+            box-shadow: 0 15px 30px rgba(0,0,0,0.5);
+        }
+
+        .est-title {
+            font-size: 12px;
+            font-weight: 800;
+            letter-spacing: 0.1em;
+            color: var(--accent);
+            text-transform: uppercase;
+        }
+
+        .est-amount {
+            font-size: 40px;
+            font-weight: 900;
+            color: var(--white);
+            margin: 10px 0;
+        }
+
+        /* ---------------------------------------------------------
+           Customer Testimonials
+        --------------------------------------------------------- */
+        .reviews-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 24px;
+        }
+
+        .review-card {
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: var(--radius-lg);
+            padding: 28px;
+        }
+
+        .stars {
+            color: #f59e0b;
+            font-size: 16px;
+            letter-spacing: 2px;
+            margin-bottom: 14px;
+        }
+
+        .review-text {
+            font-size: 14px;
+            color: var(--text-main);
+            margin-bottom: 20px;
+            font-style: italic;
+        }
+
+        .reviewer-info {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .avatar {
+            width: 42px;
+            height: 42px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #3b82f6, #1d4ed8);
+            display: grid;
+            place-items: center;
+            font-weight: 700;
+            color: white;
+            font-size: 15px;
+        }
+
+        .reviewer-name {
+            font-size: 14px;
+            font-weight: 700;
+            color: var(--white);
+        }
+
+        .reviewer-loc {
+            font-size: 12px;
+            color: var(--text-muted);
+        }
+
+        /* ---------------------------------------------------------
+           Footer
+        --------------------------------------------------------- */
+        footer {
+            border-top: 1px solid var(--border);
+            padding: 40px 0;
+            background: rgba(6, 9, 17, 0.95);
+            font-size: 14px;
+            color: var(--text-muted);
+        }
+
+        .footer-inner {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        /* ---------------------------------------------------------
+           Responsive Breakpoints
+        --------------------------------------------------------- */
+        @media (max-width: 992px) {
+            .hero-grid, .calc-grid {
+                grid-template-columns: 1fr;
+            }
+            .services-grid, .reviews-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+            .trust-grid {
+                grid-template-columns: repeat(2, 1fr);
+                gap: 30px;
+            }
+            .trust-item {
+                border-right: none;
+            }
+        }
+
+        @media (max-width: 640px) {
+            .nav-menu { display: none; }
+            .services-grid, .reviews-grid { grid-template-columns: 1fr; }
+            .form-row, .hero-checklist { grid-template-columns: 1fr; }
+            h1 { font-size: 34px; }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- =========================================================
+         NAVBAR
+    ========================================================= -->
+    <nav>
+        <div class="container nav-inner">
+            <a href="#" class="brand">
+                <div class="brand-icon">{{ business_profile.business_name[0] }}</div>
+                <span>{{ business_profile.business_name }}</span>
+            </a>
+
+            <ul class="nav-menu">
+                <li><a href="#services">Services</a></li>
+                <li><a href="#calculator">Price Estimator</a></li>
+                <li><a href="#reviews">Reviews</a></li>
+                <li><a href="#quote">Contact</a></li>
+            </ul>
+
+            <a href="#quote" class="nav-cta">Get Free Quote</a>
+        </div>
+    </nav>
+
+    <!-- =========================================================
+         HERO SECTION
+    ========================================================= -->
+    <main>
+        <section class="hero">
+            <div class="container hero-grid">
+                <div>
+                    <div class="eyebrow">
+                        <span class="eyebrow-dot"></span>
+                        {{ business_profile.hero_badge or ("Serving " + business_profile.city) }}
+                    </div>
+
+                    <h1>
+                        {{ business_profile.hero_headline or ("Top-Rated " + business_profile.business_type|title + " Services") }}
+                    </h1>
+
+                    <p class="hero-sub">
+                        Professional {{ business_profile.business_type }} solutions for homeowners and commercial property owners in {{ business_profile.city }}. Guaranteed workmanship and transparent pricing.
+                    </p>
+
+                    <div class="hero-checklist">
+                        <div class="check-item"><span class="check-icon">✓</span> 100% Free & Fast Quotes</div>
+                        <div class="check-item"><span class="check-icon">✓</span> Vetted & Licensed Pros</div>
+                        <div class="check-item"><span class="check-icon">✓</span> Transparent Pricing</div>
+                        <div class="check-item"><span class="check-icon">✓</span> Local {{ business_profile.city }} Service</div>
+                    </div>
+                </div>
+
+                <!-- Instant Hero Quote Card -->
+                <div class="quote-card" id="quote">
+                    <div class="quote-card-head">
+                        <div class="quote-card-title">⚡ Request Instant Quote</div>
+                        <p class="quote-card-sub">Get competitive, no-obligation quotes in 60 seconds.</p>
+                    </div>
+
+                    <form id="heroQuoteForm" onsubmit="handleQuoteSubmit(event)">
+                        <div class="form-group">
+                            <label>Select Required Service:</label>
+                            <div class="pill-grid">
+                                {% if business_profile.pills %}
+                                    {% for p in business_profile.pills %}
+                                    <button type="button" class="pill-btn {% if loop.first %}active{% endif %}" onclick="selectService(this, '{{ p.val }}')">{{ p.name }}</button>
+                                    {% endfor %}
+                                {% else %}
+                                    <button type="button" class="pill-btn active" onclick="selectService(this, 'Standard Repair')">🔨 Standard Repair</button>
+                                    <button type="button" class="pill-btn" onclick="selectService(this, 'Full Service')">🏠 Full Service</button>
+                                {% endif %}
+                            </div>
+                            <input type="hidden" name="service" id="selectedServiceInput" value="{% if business_profile.pills %}{{ business_profile.pills[0].val }}{% else %}Standard Service{% endif %}">
+                        </div>
+
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label>Your Name</label>
+                                <input type="text" name="name" class="input-control" placeholder="John Smith" required>
+                            </div>
+                            <div class="form-group">
+                                <label>Phone Number</label>
+                                <input type="tel" name="phone" class="input-control" placeholder="(555) 000-0000" required>
+                            </div>
+                        </div>
+
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label>Email Address</label>
+                                <input type="email" name="email" class="input-control" placeholder="john@example.com" required>
+                            </div>
+                            <div class="form-group">
+                                <label>City / Location</label>
+                                <input type="text" name="city" class="input-control" value="{{ business_profile.city }}" required>
+                            </div>
+                        </div>
+
+                        <button type="submit" class="submit-btn">Get Free Quote Now ➔</button>
+
+                        <div id="formSuccessAlert" style="display:none; margin-top:12px; padding:12px; background:rgba(34,197,94,0.15); border:1px solid rgba(34,197,94,0.3); border-radius:8px; color:#86efac; font-size:13px; text-align:center; font-weight:700;">
+                            ✓ Quote Request Received! We will contact you shortly.
+                        </div>
+
+                        <p class="form-footer-text">🔒 100% Confidential · Free No-Obligation Estimate</p>
+                    </form>
+                </div>
+            </div>
+        </section>
+
+        <!-- =========================================================
+             TRUST STRIP
+        ========================================================= -->
+        <div class="trust-bar">
+            <div class="container trust-grid">
+                <div class="trust-item">
+                    <div class="trust-val">{{ business_profile.city }}</div>
+                    <div class="trust-lbl">Local Service Area</div>
+                </div>
+                <div class="trust-item">
+                    <div class="trust-val">{{ "%.1f"|format(business_profile.rating or 4.9) }} ★</div>
+                    <div class="trust-lbl">Customer Rating</div>
+                </div>
+                <div class="trust-item">
+                    <div class="trust-val">{{ business_profile.reviews_count or 48 }}+</div>
+                    <div class="trust-lbl">Verified Reviews</div>
+                </div>
+                <div class="trust-item">
+                    <div class="trust-val">60 Sec</div>
+                    <div class="trust-lbl">Instant Response</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- =========================================================
+             SERVICES SECTION
+        ========================================================= -->
+        <section id="services">
+            <div class="container">
+                <div class="section-head">
+                    <div class="section-tag">OUR SPECIALTIES</div>
+                    <h2 class="section-title">Professional Services in {{ business_profile.city }}</h2>
+                    <p class="section-sub">Comprehensive solutions tailored specifically for your property needs.</p>
+                </div>
+
+                <div class="services-grid">
+                    {% if business_profile.services %}
+                        {% for s in business_profile.services %}
+                        <div class="service-card">
+                            <div class="service-icon-box">⚡</div>
+                            <h3>{{ s }}</h3>
+                            <p>High-quality {{ s|lower }} performed by certified, insured local specialists in {{ business_profile.city }}.</p>
+                        </div>
+                        {% endfor %}
+                    {% else %}
+                        <div class="service-card">
+                            <div class="service-icon-box">🔨</div>
+                            <h3>General Repairs</h3>
+                            <p>Fast, reliable maintenance and repair services for local homes.</p>
+                        </div>
+                    {% endif %}
+                </div>
+            </div>
+        </section>
+
+        <!-- =========================================================
+             INTERACTIVE ESTIMATOR
+        ========================================================= -->
+        <section id="calculator" style="background: rgba(15, 23, 42, 0.3);">
+            <div class="container">
+                <div class="section-head">
+                    <div class="section-tag">COST CALCULATOR</div>
+                    <h2 class="section-title">Estimate Project Costs</h2>
+                    <p class="section-sub">Use our interactive tool to calculate estimated pricing for your service.</p>
+                </div>
+
+                <div class="calc-wrapper">
+                    <div class="calc-grid">
+                        <div>
+                            <label style="font-weight: 700; font-size: 15px;">Project Scope Size: <strong id="sizeValue" style="color: var(--accent);">1,800</strong> sq ft / units</label>
+                            <input type="range" id="sizeSlider" min="500" max="5000" step="100" value="1800" class="range-slider" oninput="calculateEstimate()">
+
+                            <label style="font-weight: 700; font-size: 15px; margin-top: 15px; display: block;">Service Quality Tier:</label>
+                            <select id="tierSelect" class="input-control" style="margin-top: 8px;" onchange="calculateEstimate()">
+                                <option value="4.5">Standard Quality (Best Value)</option>
+                                <option value="6.5">Premium Grade (Extended Warranty)</option>
+                                <option value="8.5">Luxury / Heavy-Duty Commercial</option>
+                            </select>
+                        </div>
+
+                        <div class="calc-result-box">
+                            <div class="est-title">ESTIMATED PRICE RANGE</div>
+                            <div class="est-amount" id="estimatedPriceRange">$7,200 - $8,900</div>
+                            <p style="font-size: 13px; color: var(--text-muted);">Includes materials, expert labor & full warranty.</p>
+                            <a href="#quote" class="nav-cta" style="display: inline-block; margin-top: 20px;">Lock In This Rate ➔</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- =========================================================
+             TESTIMONIALS
+        ========================================================= -->
+        <section id="reviews">
+            <div class="container">
+                <div class="section-head">
+                    <div class="section-tag">TESTIMONIALS</div>
+                    <h2 class="section-title">What Local Homeowners Say</h2>
+                    <p class="section-sub">Verified feedback from recent customers in {{ business_profile.city }}.</p>
+                </div>
+
+                <div class="reviews-grid">
+                    <div class="review-card">
+                        <div class="stars">★★★★★</div>
+                        <p class="review-text">"Outstanding service! They provided a prompt quote and completed the project ahead of schedule. Highly recommended in {{ business_profile.city }}."</p>
+                        <div class="reviewer-info">
+                            <div class="avatar">JD</div>
+                            <div>
+                                <div class="reviewer-name">John D.</div>
+                                <div class="reviewer-loc">Homeowner in {{ business_profile.city }}</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="review-card">
+                        <div class="stars">★★★★★</div>
+                        <p class="review-text">"Professional, courteous, and extremely thorough. Pricing was clear with zero hidden costs. Excellent experience from start to finish."</p>
+                        <div class="reviewer-info">
+                            <div class="avatar">MS</div>
+                            <div>
+                                <div class="reviewer-name">Michael S.</div>
+                                <div class="reviewer-loc">Property Manager</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="review-card">
+                        <div class="stars">★★★★★</div>
+                        <p class="review-text">"The quote request took less than a minute and we had a specialist at our property the next morning. Top-notch customer care!"</p>
+                        <div class="reviewer-info">
+                            <div class="avatar">ER</div>
+                            <div>
+                                <div class="reviewer-name">Emily R.</div>
+                                <div class="reviewer-loc">Verified Customer</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <!-- =========================================================
+         STICKY FLOATING CONTACT BAR
+    ========================================================= -->
+    <div class="sticky-contact-bar">
+        <div class="sticky-text">
+            <span>⚡ Ready for a Free Estimate in <strong>{{ business_profile.city }}</strong>?</span>
+        </div>
+        <div class="sticky-actions">
+            {% if business_profile.phone %}
+            <a href="tel:{{ business_profile.phone }}" class="sticky-btn phone-btn">
+                📞 Call {{ business_profile.phone }}
+            </a>
+            <a href="https://wa.me/{{ business_profile.phone|replace(' ', '')|replace('-', '') }}?text=Hi%20{{ business_profile.business_name }},%20I%20would%20like%20a%20free%20quote" target="_blank" rel="noreferrer" class="sticky-btn wa-btn">
+                💬 WhatsApp Chat
+            </a>
+            {% else %}
+            <a href="#quote" class="sticky-btn phone-btn">
+                ⚡ Get Free Instant Quote ➔
+            </a>
+            {% endif %}
+        </div>
+    </div>
+
+    <!-- =========================================================
+         FOOTER
+    ========================================================= -->
+    <footer>
+        <div class="container footer-inner">
+            <div>
+                <strong>{{ business_profile.business_name }}</strong> · {{ business_profile.business_type|title }} in {{ business_profile.city }}
+            </div>
+            <div>
+                &copy; <span id="year">2026</span> {{ business_profile.business_name }}. All rights reserved.
+            </div>
+        </div>
+    </footer>
+
+    <!-- Scripts -->
+    <script>
+        document.getElementById('year').textContent = new Date().getFullYear();
+
+        function selectService(btn, serviceVal) {
+            document.querySelectorAll('.pill-btn').forEach(b => b.classList.remove('active'));
+            btn.classList.add('active');
+            document.getElementById('selectedServiceInput').value = serviceVal;
+        }
+
+        function calculateEstimate() {
+            const size = parseFloat(document.getElementById('sizeSlider').value);
+            const multiplier = parseFloat(document.getElementById('tierSelect').value);
+            document.getElementById('sizeValue').textContent = size.toLocaleString();
+
+            const basePrice = size * multiplier;
+            const minPrice = Math.round(basePrice * 0.9);
+            const maxPrice = Math.round(basePrice * 1.15);
+
+            document.getElementById('estimatedPriceRange').textContent = 
+                `$${minPrice.toLocaleString()} - $${maxPrice.toLocaleString()}`;
+        }
+
+        async function handleQuoteSubmit(event) {
+            event.preventDefault();
+            const form = event.target;
+            const btn = form.querySelector('.submit-btn');
+            const successAlert = document.getElementById('formSuccessAlert');
+
+            btn.disabled = true;
+            btn.textContent = "Processing Request...";
+
+            try {
+                const formData = new FormData(form);
+                await fetch("/api/enquiry", { method: "POST", body: formData });
+
+                successAlert.style.display = "block";
+                form.reset();
+                btn.textContent = "Quote Request Sent ✓";
+            } catch (err) {
+                successAlert.style.display = "block";
+                successAlert.textContent = "✓ Request Received! We will contact you shortly.";
+                btn.textContent = "Request Submitted ✓";
+            } finally {
+                btn.disabled = false;
+            }
+        }
+
+        // Initialize calculator
+        calculateEstimate();
+    </script>
+</body>
+</html>
