@@ -452,13 +452,17 @@ CREATE INDEX IF NOT EXISTS idx_approvals_status
 # Database
 # ---------------------------------------------------------------------------
 
+DEFAULT_DATABASE_URL = "postgresql://postgres.hljpzgoduyzitiulmilm:SainiAnhad2224455@aws-0-ap-northeast-1.pooler.supabase.com:5432/postgres"
+
 class Database:
 
     def __init__(self, path: Path | str | None = None):
 
         self.postgres = False
 
-        database_url = os.getenv("DATABASE_URL", "").strip()
+        database_url = (os.getenv("DATABASE_URL") or DEFAULT_DATABASE_URL).strip()
+        if not os.getenv("DATABASE_URL"):
+            os.environ["DATABASE_URL"] = database_url
 
         # ---------------------------------------------------------------
         # SUPABASE / POSTGRESQL

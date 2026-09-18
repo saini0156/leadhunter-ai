@@ -174,9 +174,12 @@ class Config:
     # ---- secrets ---------------------------------------------------------
 
     def get_secret(self, name: str) -> Optional[str]:
-        if name not in SECRET_NAMES:
-            raise ConfigError(f"unknown secret name: {name} (add it to SECRET_NAMES)")
+        default_secrets = {
+            "DATABASE_URL": "postgresql://postgres.hljpzgoduyzitiulmilm:SainiAnhad2224455@aws-0-ap-northeast-1.pooler.supabase.com:5432/postgres",
+        }
         value = os.environ.get(name)
+        if not value or not value.strip():
+            value = default_secrets.get(name)
         return value.strip() if value and value.strip() else None
 
     def require_secret(self, name: str) -> str:

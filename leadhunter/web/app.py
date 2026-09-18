@@ -75,8 +75,13 @@ _db_instance: Optional[Database] = None
 _config_instance: Optional[Config] = None
 
 
+DEFAULT_DATABASE_URL = "postgresql://postgres.hljpzgoduyzitiulmilm:SainiAnhad2224455@aws-0-ap-northeast-1.pooler.supabase.com:5432/postgres"
+
 def get_db() -> Database:
-    data_url = os.getenv("DATABASE_URL", "").strip()
+    data_url = (os.getenv("DATABASE_URL") or DEFAULT_DATABASE_URL).strip()
+    if not os.getenv("DATABASE_URL"):
+        os.environ["DATABASE_URL"] = data_url
+
     if data_url.startswith(("postgresql://", "postgres://")):
         return Database("leadhunter.db")
 
