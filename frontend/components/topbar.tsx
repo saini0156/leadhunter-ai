@@ -1,6 +1,6 @@
 "use client";
 
-import { Menu, Bell, Search } from "lucide-react";
+import { Menu, Bell, Search, LogOut } from "lucide-react";
 
 const titles: Record<string, string> = {
   "/dashboard": "Dashboard",
@@ -17,10 +17,12 @@ const titles: Record<string, string> = {
 
 export default function Topbar({
   pathname,
-  onMenu
+  onMenu,
+  onLogout
 }: {
   pathname: string;
   onMenu: () => void;
+  onLogout?: () => void;
 }) {
   const title =
     titles[pathname] ||
@@ -39,6 +41,11 @@ export default function Topbar({
       <div className="top-actions">
         <button className="search-btn"><Search size={14} /> Search <span style={{ marginLeft: "auto", color: "#9aa7ba" }}>/</span></button>
         <button className="icon-btn"><Bell size={15} /><span className="notification-dot" /></button>
+        {onLogout && (
+          <button className="icon-btn" onClick={onLogout} title="Log Out / Lock Dashboard" style={{ color: "#ef4444" }}>
+            <LogOut size={15} />
+          </button>
+        )}
         <div className="avatar">NS</div>
       </div>
     </header>
