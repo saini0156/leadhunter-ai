@@ -64,7 +64,11 @@ def enqueue_lead_for_approval(
         },
     )
     db.conn.commit()
-    approval_id = int(cur.lastrowid)
+    if cur.lastrowid is not None:
+        approval_id = int(cur.lastrowid)
+    else:
+        app_row = db.conn.execute("SELECT approval_id FROM approvals WHERE lead_id = ?", (lead.id,)).fetchone()
+        approval_id = int(app_row["approval_id"]) if app_row else lead.id
 
     # Transition lead status to PENDING_APPROVAL if not already there
     if lead.status != LeadStatus.PENDING_APPROVAL:

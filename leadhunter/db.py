@@ -648,7 +648,11 @@ class Database:
 
         self.conn.commit()
 
-        return int(cur.lastrowid)
+        if cur.lastrowid is not None:
+            return int(cur.lastrowid)
+
+        run_row = self.conn.execute("SELECT MAX(id) AS id FROM runs").fetchone()
+        return int(run_row["id"]) if run_row and run_row["id"] is not None else 1
 
     def end_run(
         self,
@@ -850,7 +854,15 @@ class Database:
 
         self.conn.commit()
 
-        return int(cur.lastrowid), True
+        if cur.lastrowid is not None:
+            return int(cur.lastrowid), True
+
+        lead_row = self.conn.execute("SELECT id FROM leads WHERE fingerprint = ?", (fp,)).fetchone()
+        if lead_row:
+            return int(lead_row["id"]), True
+
+        lead_max = self.conn.execute("SELECT MAX(id) AS id FROM leads").fetchone()
+        return (int(lead_max["id"]) if lead_max and lead_max["id"] is not None else 1), True
 
     def get_lead(
         self,
