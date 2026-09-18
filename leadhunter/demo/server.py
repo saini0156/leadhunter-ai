@@ -303,166 +303,56 @@ def find_lead_by_slug_or_id(identifier: str):
 # Business profile
 # ---------------------------------------------------------------------------
 
-def resolve_category_design(category: str, business_type: str, city: str) -> Dict[str, Any]:
-    cat = (category or "").lower()
-    btype = (business_type or "").lower()
-    text = f"{cat} {btype}"
-    c_str = city or "your area"
+def resolve_category_design(category: str, business_name: str, city: str) -> Dict[str, Any]:
+    from leadhunter.demo.niche_engine import resolve_niche_data
 
-    if "plumb" in text:
-        return {
-            "accent_color": "#0284c7",
-            "accent_dark": "#1d4ed8",
-            "hero_image": "https://images.unsplash.com/photo-1607472586893-edb57bdc0e39?auto=format&fit=crop&w=1600&q=85",
-            "hero_badge": f"💧 24/7 Emergency Plumbers in {c_str}",
-            "hero_headline": f"Fast & Reliable Plumbing Repairs in {c_str}",
-            "pills": [
-                {"name": "🔧 Pipe Repair", "val": "Pipe Repair"},
-                {"name": "🚿 Drain Unclog", "val": "Drain Cleaning"},
-                {"name": "🔥 Water Heater", "val": "Water Heater"},
-                {"name": "🚨 Leak Fix", "val": "Emergency Leak"}
-            ],
-            "services": [
-                "Emergency Drain Unclogging",
-                "Water Heater Repair & Install",
-                "Burst Pipe & Leak Repair",
-                "Bathroom & Kitchen Plumbing",
-                "Sewer Line Camera Inspection",
-                "Commercial Plumbing Solutions"
-            ]
-        }
-    elif "hvac" in text or "heat" in text or "air" in text or "cool" in text:
-        return {
-            "accent_color": "#06b6d4",
-            "accent_dark": "#0891b2",
-            "hero_image": "https://images.unsplash.com/photo-1621905251189-08b45d6a269e?auto=format&fit=crop&w=1600&q=85",
-            "hero_badge": f"❄️ Certified HVAC & Heating Specialists in {c_str}",
-            "hero_headline": f"Keep Your Home Comfortable All Year Round",
-            "pills": [
-                {"name": "❄️ AC Repair", "val": "AC Repair"},
-                {"name": "🔥 Furnace Repair", "val": "Furnace Repair"},
-                {"name": "🌬️ Heat Pump", "val": "Heat Pump"},
-                {"name": "🚨 HVAC Emergency", "val": "HVAC Repair"}
-            ],
-            "services": [
-                "Air Conditioning Repair & Tuning",
-                "Furnace Maintenance & Installation",
-                "Heat Pump Replacement",
-                "Duct Cleaning & Air Purification",
-                "Thermostat & Smart Controls",
-                "24/7 Emergency Climate Repair"
-            ]
-        }
-    elif "clean" in text or "janitor" in text or "maid" in text:
-        return {
-            "accent_color": "#10b981",
-            "accent_dark": "#059669",
-            "hero_image": "https://images.unsplash.com/photo-1581578731548-c64695cc6952?auto=format&fit=crop&w=1600&q=85",
-            "hero_badge": f"✨ #1 Top-Rated Professional Cleaners in {c_str}",
-            "hero_headline": f"Spotless Residential & Commercial Cleaning Services",
-            "pills": [
-                {"name": "✨ House Clean", "val": "House Cleaning"},
-                {"name": "🏢 Office Clean", "val": "Office Cleaning"},
-                {"name": "🧼 Carpet Steam", "val": "Carpet Cleaning"},
-                {"name": "🔑 Move-In/Out", "val": "Move-In Cleaning"}
-            ],
-            "services": [
-                "Deep Residential House Cleaning",
-                "Commercial & Office Janitorial",
-                "Carpet & Upholstery Steam Clean",
-                "Move-In / Move-Out Deep Clean",
-                "Post-Construction Cleanup",
-                "Recurring Eco-Friendly Cleaning"
-            ]
-        }
-    elif "landscap" in text or "lawn" in text or "garden" in text or "tree" in text:
-        return {
-            "accent_color": "#22c55e",
-            "accent_dark": "#16a34a",
-            "hero_image": "https://images.unsplash.com/photo-1558904541-efa843a96f01?auto=format&fit=crop&w=1600&q=85",
-            "hero_badge": f"🌿 Premier Lawn Care & Landscape Designers in {c_str}",
-            "hero_headline": f"Transform Your Yard Into a Outdoor Paradise",
-            "pills": [
-                {"name": "🌿 Lawn Care", "val": "Lawn Maintenance"},
-                {"name": "🌳 Tree Care", "val": "Tree Care"},
-                {"name": "🏡 Design", "val": "Landscape Design"},
-                {"name": "🧱 Patio/Paving", "val": "Hardscaping"}
-            ],
-            "services": [
-                "Full Custom Landscape Architecture",
-                "Weekly Lawn Care & Fertilization",
-                "Paver Patios & Retaining Walls",
-                "Tree Pruning & Stump Removal",
-                "Irrigation & Sprinkler Systems",
-                "Seasonal Cleanup & Mulching"
-            ]
-        }
-    elif "electric" in text:
-        return {
-            "accent_color": "#eab308",
-            "accent_dark": "#ca8a04",
-            "hero_image": "https://images.unsplash.com/photo-1621905252507-b35492cc74b4?auto=format&fit=crop&w=1600&q=85",
-            "hero_badge": f"⚡ Licensed Master Electricians in {c_str}",
-            "hero_headline": f"Safe, Certified Electrical Repairs & Panel Upgrades",
-            "pills": [
-                {"name": "⚡ Repair", "val": "Electrical Repair"},
-                {"name": "🔌 Panel Upgrade", "val": "Panel Upgrade"},
-                {"name": "💡 Lighting", "val": "Lighting Install"},
-                {"name": "🚨 EV Charger", "val": "EV Charger Install"}
-            ],
-            "services": [
-                "200A Electrical Panel Upgrades",
-                "EV Home Charger Installation",
-                "Indoor & Outdoor LED Lighting",
-                "Full House Wiring & Safety Audits",
-                "Generator Hookups & Backups",
-                "24/7 Emergency Electrical Repair"
-            ]
-        }
-    elif "real estate" in text or "realtor" in text:
-        return {
-            "accent_color": "#a855f7",
-            "accent_dark": "#7e22ce",
-            "hero_image": "https://images.unsplash.com/photo-1600585154340-be6161a56a0c?auto=format&fit=crop&w=1600&q=85",
-            "hero_badge": f"🏛️ Trusted Real Estate Experts in {c_str}",
-            "hero_headline": f"Find Your Dream Home or Sell for Max Value",
-            "pills": [
-                {"name": "🏠 Buy Home", "val": "Home Buying"},
-                {"name": "🏷️ Sell Property", "val": "Home Selling"},
-                {"name": "🔍 Free Valuation", "val": "Property Valuation"},
-                {"name": "🏢 Commercial", "val": "Commercial Real Estate"}
-            ],
-            "services": [
-                "Luxury Residential Home Sales",
-                "Instant Free Home Value Estimates",
-                "Buyer Representation & Tour Booking",
-                "Commercial Property Acquisitions",
-                "Investment Property Advisory",
-                "Staging & Professional Photography"
-            ]
-        }
+    c_str = city or "Surrey, BC"
+    target = f"{category or ''} {business_name or ''}"
+    b_name = business_name or "Local Business"
+    niche = resolve_niche_data(category=target, business_name=b_name, city=c_str)
+
+    accent = niche.get("accent_hex", "#f97316")
+
+    pills = []
+    if niche.get("booking_options"):
+        for opt in niche["booking_options"]:
+            pills.append({"name": opt, "val": opt})
+    elif niche.get("services"):
+        for s in niche["services"]:
+            stitle = s.get("title", "") if isinstance(s, dict) else str(s)
+            pills.append({"name": stitle, "val": stitle})
+
+    if not pills:
+        pills = [
+            {"name": "Standard Service", "val": "Standard Service"},
+            {"name": "Full Service", "val": "Full Service"}
+        ]
+
+    services_list = []
+    if niche.get("services"):
+        for s in niche["services"]:
+            if isinstance(s, dict):
+                services_list.append(s.get("title", ""))
+            else:
+                services_list.append(str(s))
     else:
-        return {
-            "accent_color": "#f97316",
-            "accent_dark": "#ea580c",
-            "hero_image": "https://images.unsplash.com/photo-1632759145351-1d592919f522?auto=format&fit=crop&w=1600&q=85",
-            "hero_badge": f"🔨 #1 Vetted Roofing Contractors in {c_str}",
-            "hero_headline": f"Reliable Roofing Services Built Around Your Property",
-            "pills": [
-                {"name": "🔨 Roof Repair", "val": "Roof Repair"},
-                {"name": "🏠 Replacement", "val": "Roof Replacement"},
-                {"name": "📐 Flat Roof", "val": "Flat Roofing"},
-                {"name": "🚨 Emergency Leak", "val": "Leak Repair"}
-            ],
-            "services": [
-                "Full Asphalt Shingle & Metal Roof Replacement",
-                "Emergency Roof Leak & Storm Repair",
-                "Flat EPDM & Commercial Roofing Systems",
-                "Tile & Slate Roof Restoration",
-                "Chimney Flashing & Gutter Repair",
-                "Annual Preventive Maintenance Inspections"
-            ]
-        }
+        services_list = ["Professional Consultation", "Expert Service Execution", "Guaranteed Workmanship"]
+
+    badge = niche.get("badge", f"Premier Services in {c_str}")
+    if c_str not in badge:
+        badge = f"{badge} in {c_str}"
+
+    headline = niche.get("hero_title", f"Top-Rated Services in {c_str}")
+
+    return {
+        "accent_color": accent,
+        "accent_dark": accent,
+        "hero_image": niche.get("hero_img", "https://images.unsplash.com/photo-1632759145351-1d592919f522?auto=format&fit=crop&w=1600&q=85"),
+        "hero_badge": badge,
+        "hero_headline": headline,
+        "pills": pills,
+        "services": services_list
+    }
 
 
 def build_business_profile(lead: Any) -> Dict[str, Any]:
@@ -538,27 +428,49 @@ def build_business_profile(lead: Any) -> Dict[str, Any]:
         data.get("qualified")
     )
 
-    business_type = "roofing company"
+    business_type = "local business"
     category_lower = category.lower()
 
-    if "plumb" in category_lower:
+    if any(k in category_lower for k in ["dent", "teeth", "smile", "ortho"]):
+        business_type = "dental clinic"
+    elif any(k in category_lower for k in ["plumb"]):
         business_type = "plumbing company"
-    elif "hvac" in category_lower:
+    elif any(k in category_lower for k in ["hvac", "heat", "air", "cool"]):
         business_type = "HVAC company"
-    elif "clean" in category_lower:
+    elif any(k in category_lower for k in ["clean", "janitor", "maid"]):
         business_type = "cleaning company"
-    elif "landscap" in category_lower:
+    elif any(k in category_lower for k in ["landscap", "lawn", "garden"]):
         business_type = "landscaping company"
-    elif "construction" in category_lower:
-        business_type = "construction company"
-    elif "real estate" in category_lower:
+    elif any(k in category_lower for k in ["cafe", "coffee", "bakery", "bake"]):
+        business_type = "cafe & bakery"
+    elif any(k in category_lower for k in ["restaur", "din", "food", "kitchen", "biryani"]):
+        business_type = "restaurant"
+    elif any(k in category_lower for k in ["salon", "spa", "beauty", "hair", "makeup"]):
+        business_type = "salon & spa"
+    elif any(k in category_lower for k in ["auto", "car", "mechanic", "garage", "detailing"]):
+        business_type = "auto repair shop"
+    elif any(k in category_lower for k in ["motorcycle", "bike", "two wheeler"]):
+        business_type = "motorcycle shop"
+    elif any(k in category_lower for k in ["real estate", "realtor", "property"]):
         business_type = "real estate agency"
-    elif "electric" in category_lower:
+    elif any(k in category_lower for k in ["electric"]):
         business_type = "electrician"
-    elif "roof" in category_lower:
+    elif any(k in category_lower for k in ["roof"]):
         business_type = "roofing company"
+    elif any(k in category_lower for k in ["law", "legal", "advocate", "attorney", "ca"]):
+        business_type = "law firm"
+    elif any(k in category_lower for k in ["gym", "fitness", "workout"]):
+        business_type = "fitness center"
+    elif any(k in category_lower for k in ["doctor", "clinic", "medical", "hospital", "health"]):
+        business_type = "medical clinic"
+    elif any(k in category_lower for k in ["school", "coaching", "academy", "tuition"]):
+        business_type = "educational academy"
+    elif any(k in category_lower for k in ["sport", "turf", "cricket"]):
+        business_type = "sports arena"
+    elif category:
+        business_type = category
 
-    cat_design = resolve_category_design(category, business_type, city)
+    cat_design = resolve_category_design(category, name, city)
     services = cat_design["services"]
     service_area = city or "Local Area"
 
@@ -700,7 +612,7 @@ def build_business_profile(lead: Any) -> Dict[str, Any]:
             "Hero",
             "Services",
             "Why Choose Us",
-            "Roofing Process",
+            "Our Process",
             "Service Area",
             "Gallery",
             "FAQ",

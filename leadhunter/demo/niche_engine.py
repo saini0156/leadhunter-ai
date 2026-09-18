@@ -542,7 +542,271 @@ NICHE_DEFINITIONS: Dict[str, Dict[str, Any]] = {
         "metric_label": "Students Mentored"
     },
 
-    # 💼 13. GENERAL BUSINESS & PROFESSIONAL SERVICES
+    # 🏠 13. ROOFING CONTRACTORS
+    "roofing": {
+        "layout_style": "split_modern",
+        "keywords": ["roof", "roofer", "roofing", "shingle", "gutter"],
+        "icon": "fa-house-chimney-crack",
+        "badge": "#1 Vetted Roofing Contractors",
+        "theme": "orange",
+        "accent_hex": "#f97316",
+        "gradient": "from-orange-600 via-amber-600 to-orange-700",
+        "glow": "bg-orange-600/20",
+        "hero_title": "Reliable Roofing Services Built Around Your Property with {name}",
+        "hero_desc": "Full asphalt shingle & metal roof replacements, emergency leak repairs, flat EPDM commercial systems, and annual preventive maintenance inspections in {city}.",
+        "hero_img": "https://images.unsplash.com/photo-1632759145351-1d592919f522?auto=format&fit=crop&w=1600&q=85",
+        "cta_booking": "Request Free Roof Inspection",
+        "cta_chat": "WhatsApp Roofing Team",
+        "service_title": "Comprehensive Roofing & Exterior Protection",
+        "services": [
+            {
+                "title": "Full Roof Replacement",
+                "desc": "Asphalt shingle, architectural tile, and metal roof installations with multi-decade warranties.",
+                "badge": "🏠 Full Replacement",
+                "img": "https://images.unsplash.com/photo-1632759145351-1d592919f522?auto=format&fit=crop&w=600&q=80"
+            },
+            {
+                "title": "Emergency Leak & Storm Repair",
+                "desc": "24/7 rapid response for wind damage, tarping, burst leaks, and structural fixes.",
+                "badge": "🚨 24/7 Emergency",
+                "img": "https://images.unsplash.com/photo-1517646287270-a5a9ca602e5c?auto=format&fit=crop&w=600&q=80"
+            },
+            {
+                "title": "Commercial EPDM & Flat Roofing",
+                "desc": "TPO, EPDM single-ply membranes, and gravel flat roof systems for business properties.",
+                "badge": "🏢 Commercial",
+                "img": "https://images.unsplash.com/photo-1541888946425-d0fbb186a5b3?auto=format&fit=crop&w=600&q=80"
+            }
+        ],
+        "booking_heading": "Schedule Your Free Roof Inspection",
+        "booking_field_label": "Requirement",
+        "booking_options": ["Roof Inspection & Quote", "Emergency Leak Repair", "Full Roof Replacement", "Commercial Flat Roofing"],
+        "metric_1": "1,500+ Roofs Built",
+        "metric_2": "100% Certified",
+        "metric_label": "Satisfied Homeowners"
+    },
+
+    # 💧 14. PLUMBING SERVICES
+    "plumbing": {
+        "layout_style": "split_modern",
+        "keywords": ["plumb", "plumber", "drain", "water heater", "pipe", "sewer"],
+        "icon": "fa-faucet-drip",
+        "badge": "24/7 Emergency Plumbers",
+        "theme": "sky",
+        "accent_hex": "#0284c7",
+        "gradient": "from-sky-600 via-blue-600 to-sky-700",
+        "glow": "bg-sky-600/20",
+        "hero_title": "Fast & Reliable Plumbing Repairs in {city} by {name}",
+        "hero_desc": "Emergency drain unclogging, tankless water heater installation, pipe leak detection, and hydro-jetting sewer line cleaning in {city}.",
+        "hero_img": "https://images.unsplash.com/photo-1607472586893-edb57bdc0e39?auto=format&fit=crop&w=1600&q=85",
+        "cta_booking": "Book Emergency Plumber",
+        "cta_chat": "WhatsApp Dispatch",
+        "service_title": "Complete Residential & Commercial Plumbing",
+        "services": [
+            {
+                "title": "Emergency Drain Unclogging",
+                "desc": "High-pressure hydro-jetting and rooter drain clearing for kitchens and main sewer lines.",
+                "badge": "🚿 Drain Master",
+                "img": "https://images.unsplash.com/photo-1585704032915-c3400ca199e7?auto=format&fit=crop&w=600&q=80"
+            },
+            {
+                "title": "Tankless Water Heater Installation",
+                "desc": "Energy-efficient endless hot water systems, repair, and annual flush maintenance.",
+                "badge": "🔥 Water Heater",
+                "img": "https://images.unsplash.com/photo-1507652313519-d4e9174996dd?auto=format&fit=crop&w=600&q=80"
+            },
+            {
+                "title": "Burst Pipe & Leak Repair",
+                "desc": "Thermal imaging leak detection and rapid pipe replacement to prevent water damage.",
+                "badge": "💧 Leak Fix",
+                "img": "https://images.unsplash.com/photo-1607472586893-edb57bdc0e39?auto=format&fit=crop&w=600&q=80"
+            }
+        ],
+        "booking_heading": "Schedule Plumbing Service",
+        "booking_field_label": "Plumbing Issue",
+        "booking_options": ["Pipe Repair & Leak Fix", "Drain Unclogging", "Water Heater Repair/Install", "24/7 Emergency Service"],
+        "metric_1": "5,000+ Leaks Fixed",
+        "metric_2": "100% Licensed",
+        "metric_label": "Happy Clients"
+    },
+
+    # ❄️ 15. HVAC & HEATING
+    "hvac": {
+        "layout_style": "split_modern",
+        "keywords": ["hvac", "heat", "air conditioning", "furnace", "cool", "ventilation", "duct"],
+        "icon": "fa-temperature-arrow-up",
+        "badge": "Certified HVAC & Heating Specialists",
+        "theme": "cyan",
+        "accent_hex": "#06b6d4",
+        "gradient": "from-cyan-600 via-blue-600 to-cyan-700",
+        "glow": "bg-cyan-600/20",
+        "hero_title": "Keep Your Home Comfortable All Year Round with {name}",
+        "hero_desc": "24/7 emergency climate control, furnace maintenance, heat pump installations, and air purification in {city}.",
+        "hero_img": "https://images.unsplash.com/photo-1621905251189-08b45d6a269e?auto=format&fit=crop&w=1600&q=85",
+        "cta_booking": "Book HVAC Technician",
+        "cta_chat": "WhatsApp HVAC Desk",
+        "service_title": "Full-Service Climate & Heating Care",
+        "services": [
+            {
+                "title": "AC Repair & Tuning",
+                "desc": "Precision seasonal tune-ups, refrigerant recharge, and compressor troubleshooting.",
+                "badge": "❄️ AC Service",
+                "img": "https://images.unsplash.com/photo-1621905251189-08b45d6a269e?auto=format&fit=crop&w=600&q=80"
+            },
+            {
+                "title": "Furnace Maintenance & Install",
+                "desc": "High-efficiency gas and electric furnace replacements and emergency heat restoration.",
+                "badge": "🔥 Heating Care",
+                "img": "https://images.unsplash.com/photo-1581094288338-2314dddb7ece?auto=format&fit=crop&w=600&q=80"
+            },
+            {
+                "title": "Duct Cleaning & Air Quality",
+                "desc": "HEPA duct sanitization, UV air purifiers, and smart thermostat integration.",
+                "badge": "🌬️ Clean Air",
+                "img": "https://images.unsplash.com/photo-1507652313519-d4e9174996dd?auto=format&fit=crop&w=600&q=80"
+            }
+        ],
+        "booking_heading": "Schedule HVAC Service Slot",
+        "booking_field_label": "System Type",
+        "booking_options": ["AC Repair & Tune-up", "Furnace Maintenance", "Heat Pump Install", "HVAC Emergency Repair"],
+        "metric_1": "3,500+ Systems Serviced",
+        "metric_2": "24/7 Rapid Response",
+        "metric_label": "Satisfied Customers"
+    },
+
+    # 🌿 16. LANDSCAPING & LAWN CARE
+    "landscaping": {
+        "layout_style": "split_modern",
+        "keywords": ["landscap", "lawn", "garden", "tree", "hardscape", "patio", "paving", "mow"],
+        "icon": "fa-tree",
+        "badge": "Premier Lawn Care & Landscape Designers",
+        "theme": "emerald",
+        "accent_hex": "#22c55e",
+        "gradient": "from-emerald-600 via-green-600 to-emerald-700",
+        "glow": "bg-emerald-600/20",
+        "hero_title": "Transform Your Yard Into an Outdoor Paradise with {name}",
+        "hero_desc": "Custom landscape architecture, weekly lawn fertilization, paver patios, retaining walls, and tree care in {city}.",
+        "hero_img": "https://images.unsplash.com/photo-1558904541-efa843a96f01?auto=format&fit=crop&w=1600&q=85",
+        "cta_booking": "Book Landscape Consult",
+        "cta_chat": "WhatsApp Yard Desk",
+        "service_title": "Custom Outdoor Living & Landscaping Solutions",
+        "services": [
+            {
+                "title": "Custom Landscape Architecture",
+                "desc": "3D outdoor renderings, sod installation, perennial gardens, and automated sprinkler systems.",
+                "badge": "🌿 Design Studio",
+                "img": "https://images.unsplash.com/photo-1558904541-efa843a96f01?auto=format&fit=crop&w=600&q=80"
+            },
+            {
+                "title": "Paver Patios & Hardscaping",
+                "desc": "Interlocking stone driveways, retaining walls, outdoor fire pits, and stone walkways.",
+                "badge": "🧱 Hardscape",
+                "img": "https://images.unsplash.com/photo-1584467735871-8e85353a8413?auto=format&fit=crop&w=600&q=80"
+            },
+            {
+                "title": "Weekly Lawn Care & Fertilization",
+                "desc": "Precision mowing, edging, aeration, weed control, and seasonal leaf cleanup.",
+                "badge": "🚜 Lawn Care",
+                "img": "https://images.unsplash.com/photo-1592417817098-8f3d6eb23659?auto=format&fit=crop&w=600&q=80"
+            }
+        ],
+        "booking_heading": "Schedule Landscape Consultation",
+        "booking_field_label": "Service Type",
+        "booking_options": ["Lawn Maintenance", "Tree Trimming & Removal", "Landscape Design Consultation", "Hardscaping & Patio"],
+        "metric_1": "2,000+ Yards Transformed",
+        "metric_2": "100% Eco-Friendly",
+        "metric_label": "Happy Property Owners"
+    },
+
+    # ⚡ 17. ELECTRICAL SERVICES
+    "electrical": {
+        "layout_style": "split_modern",
+        "keywords": ["electric", "electrician", "wiring", "panel", "lighting", "generator", "ev charger"],
+        "icon": "fa-bolt",
+        "badge": "Licensed Master Electricians",
+        "theme": "amber",
+        "accent_hex": "#eab308",
+        "gradient": "from-amber-500 via-yellow-600 to-amber-600",
+        "glow": "bg-amber-500/20",
+        "hero_title": "Safe, Certified Electrical Repairs & Panel Upgrades by {name}",
+        "hero_desc": "200A panel upgrades, EV charger installation, smart home LED lighting, generator hookups, and 24/7 emergency repair in {city}.",
+        "hero_img": "https://images.unsplash.com/photo-1621905252507-b35492cc74b4?auto=format&fit=crop&w=1600&q=85",
+        "cta_booking": "Book Electrician Slot",
+        "cta_chat": "WhatsApp Master Electrician",
+        "service_title": "Full-Service Residential & Commercial Electrical",
+        "services": [
+            {
+                "title": "200A Electrical Panel Upgrades",
+                "desc": "Replace outdated fuse boxes with modern heavy-duty breaker panels for solar & EV readiness.",
+                "badge": "⚡ Panel Tech",
+                "img": "https://images.unsplash.com/photo-1621905252507-b35492cc74b4?auto=format&fit=crop&w=600&q=80"
+            },
+            {
+                "title": "EV Home Charger Installation",
+                "desc": "Level 2 fast charger installs for Tesla and all electric vehicles with dedicated circuits.",
+                "badge": "🔌 EV Ready",
+                "img": "https://images.unsplash.com/photo-1563720223185-11003d516935?auto=format&fit=crop&w=600&q=80"
+            },
+            {
+                "title": "Indoor & Outdoor LED Lighting",
+                "desc": "Architectural recessed lighting, dimmers, landscape accent lighting, and security floodlights.",
+                "badge": "💡 Smart Light",
+                "img": "https://images.unsplash.com/photo-1513506003901-1e6a229e2d15?auto=format&fit=crop&w=600&q=80"
+            }
+        ],
+        "booking_heading": "Schedule Electrical Service",
+        "booking_field_label": "Requirement",
+        "booking_options": ["Electrical Inspection & Repair", "200A Panel Upgrade", "EV Charger Install", "Lighting & Outlets"],
+        "metric_1": "4,000+ Homes Wired",
+        "metric_2": "100% Certified",
+        "metric_label": "Satisfied Clients"
+    },
+
+    # ✨ 18. CLEANING & JANITORIAL
+    "cleaning": {
+        "layout_style": "split_modern",
+        "keywords": ["clean", "cleaner", "janitor", "maid", "carpet", "housekeeping"],
+        "icon": "fa-sparkles",
+        "badge": "#1 Top-Rated Professional Cleaners",
+        "theme": "emerald",
+        "accent_hex": "#10b981",
+        "gradient": "from-emerald-600 via-teal-600 to-emerald-700",
+        "glow": "bg-emerald-600/20",
+        "hero_title": "Spotless Residential & Commercial Cleaning Services by {name}",
+        "hero_desc": "Deep house cleaning, commercial janitorial care, carpet steam sanitization, and move-in/out deep cleaning in {city}.",
+        "hero_img": "https://images.unsplash.com/photo-1581578731548-c64695cc6952?auto=format&fit=crop&w=1600&q=85",
+        "cta_booking": "Book Cleaning Slot",
+        "cta_chat": "WhatsApp Cleaning Desk",
+        "service_title": "Eco-Friendly Cleaning & Janitorial Solutions",
+        "services": [
+            {
+                "title": "Deep Residential House Cleaning",
+                "desc": "Complete home disinfection, kitchen scrub, bathroom sanitization, and dust-free surfaces.",
+                "badge": "✨ Home Care",
+                "img": "https://images.unsplash.com/photo-1581578731548-c64695cc6952?auto=format&fit=crop&w=600&q=80"
+            },
+            {
+                "title": "Commercial & Office Janitorial",
+                "desc": "Scheduled office maintenance, floor waxing, trash disposal, and eco-friendly sanitization.",
+                "badge": "🏢 Commercial",
+                "img": "https://images.unsplash.com/photo-1628177142898-93e36e4e3a50?auto=format&fit=crop&w=600&q=80"
+            },
+            {
+                "title": "Carpet & Upholstery Steam Clean",
+                "desc": "Hot water extraction carpet deep cleaning, stain removal, and odor elimination.",
+                "badge": "🧼 Steam Extract",
+                "img": "https://images.unsplash.com/photo-1558317374-067fb5f30001?auto=format&fit=crop&w=600&q=80"
+            }
+        ],
+        "booking_heading": "Schedule Cleaning Service",
+        "booking_field_label": "Cleaning Type",
+        "booking_options": ["Deep Residential House Clean", "Commercial Office Cleaning", "Carpet & Upholstery Steam", "Move-In / Move-Out Clean"],
+        "metric_1": "10,000+ Clean Spaces",
+        "metric_2": "100% Eco Products",
+        "metric_label": "Happy Clients"
+    },
+
+    # 💼 19. GENERAL BUSINESS & PROFESSIONAL SERVICES
     "business": {
         "layout_style": "bento_luxury",
         "keywords": [],
