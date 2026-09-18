@@ -81,6 +81,11 @@ const DASHBOARD_HTML = `
             <button class="btn btn-gradient" id="btnRunFullPipeline" onclick="runStage('all')">
                 <span class="btn-icon">🚀</span> Run Full Pipeline
             </button>
+
+            <!-- Logout Action -->
+            <button class="btn btn-outline btn-sm" onclick="handleLogout()" style="color: #ef4444; border-color: rgba(239, 68, 68, 0.4); border-radius: 8px; padding: 6px 14px; font-weight: 600;">
+                🔒 Logout
+            </button>
         </div>
     </header>
 
@@ -623,7 +628,7 @@ export default function DashboardPage() {
     <>
       <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700;800&family=Plus+Jakarta+Sans:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" />
       <link rel="stylesheet" href="/static/css/dashboard.css" />
-      <div dangerouslySetInnerHTML={{ __html: DASHBOARD_HTML }} />
+      <div style={{ minHeight: '100vh', backgroundColor: '#090d16', color: '#f8fafc' }} dangerouslySetInnerHTML={{ __html: DASHBOARD_HTML }} />
       <Script src="/static/js/dashboard.js" strategy="afterInteractive" onLoad={() => {
         if (typeof window !== "undefined" && (window as any).refreshAllData) {
           (window as any).refreshAllData();

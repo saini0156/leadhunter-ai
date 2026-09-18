@@ -1044,3 +1044,11 @@ function exportToCsv() {
     setTimeout(() => a.remove(), 1000);
 }
 
+function handleLogout() {
+    document.cookie = "leadhunter_auth_session=; path=/; expires=Thu, 01 Jan 1970 00:00:00 GMT";
+    sessionStorage.removeItem("leadhunter_auth_token");
+    localStorage.removeItem("leadhunter_auth_token");
+    window.location.href = "/login";
+}
+
+
