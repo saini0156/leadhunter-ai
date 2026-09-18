@@ -76,8 +76,21 @@ _config_instance: Optional[Config] = None
 
 
 def get_db() -> Database:
+    data_url = os.getenv("DATABASE_URL", "").strip()
+    if data_url.startswith(("postgresql://", "postgres://")):
+        return Database("leadhunter.db")
+
     data_dir = os.path.join(os.getcwd(), "data")
-    db_path = os.path.join(data_dir, "leadhunter.db")
+    try:
+        os.makedirs(data_dir, exist_ok=True)
+        db_path = os.path.join(data_dir, "leadhunter.db")
+        test_file = os.path.join(data_dir, ".writable_test")
+        with open(test_file, "w") as f:
+            f.write("1")
+        os.remove(test_file)
+    except Exception:
+        db_path = "/tmp/leadhunter.db"
+
     return Database(db_path)
 
 

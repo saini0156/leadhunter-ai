@@ -143,14 +143,33 @@ class Config:
     @property
     def data_dir(self) -> Path:
         override = os.environ.get("LEADHUNTER_DATA_DIR")
-        base = Path(override) if override else Path(self.get("app.data_dir", "./data"))
-        if not base.is_absolute():
-            base = self.config_path.parent / base
-        return base.resolve()
+        if override:
+            return Path(override).resolve()
+
+        local_base = Path(self.get("app.data_dir", "./data"))
+        if not local_base.is_absolute():
+            local_base = (self.config_path.parent / local_base).resolve()
+
+        try:
+            local_base.mkdir(parents=True, exist_ok=True)
+            test_file = local_base / ".writable_test"
+            test_file.write_text("1")
+            test_file.unlink()
+            return local_base
+        except Exception:
+            tmp_base = Path("/tmp/leadhunter_data").resolve()
+            try:
+                tmp_base.mkdir(parents=True, exist_ok=True)
+            except Exception:
+                pass
+            return tmp_base
 
     def ensure_dirs(self) -> None:
-        for sub in ("", "logs", "reports", "demos", "outbox", "export", "demos"):
-            (self.data_dir / sub).mkdir(parents=True, exist_ok=True)
+        for sub in ("", "logs", "reports", "demos", "outbox", "export"):
+            try:
+                (self.data_dir / sub).mkdir(parents=True, exist_ok=True)
+            except Exception:
+                pass
 
     # ---- secrets ---------------------------------------------------------
 
