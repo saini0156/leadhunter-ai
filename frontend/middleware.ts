@@ -4,10 +4,13 @@ import type { NextRequest } from "next/server";
 export function middleware(request: NextRequest) {
   const { pathname } = request.nextUrl;
 
-  // Allow Next.js static assets, favicon, and login page
+  // Allow Next.js static assets, API rewrites, preview pages, favicon, and login page
   if (
     pathname.startsWith("/_next") ||
     pathname.startsWith("/static") ||
+    pathname.startsWith("/api") ||
+    pathname.startsWith("/demo") ||
+    pathname.startsWith("/preview") ||
     pathname === "/login" ||
     pathname === "/favicon.ico"
   ) {

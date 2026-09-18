@@ -1,14 +1,9 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { usePathname } from "next/navigation";
 import { Lock, ShieldCheck, Eye, EyeOff, KeyRound } from "lucide-react";
-import Sidebar from "./sidebar";
-import Topbar from "./topbar";
 
 export default function AppShell({ children }: { children: React.ReactNode }) {
-  const pathname = usePathname();
-  const [open, setOpen] = useState(false);
   const [authenticated, setAuthenticated] = useState<boolean | null>(null);
   const [passwordInput, setPasswordInput] = useState("");
   const [showPassword, setShowPassword] = useState(false);
@@ -28,19 +23,13 @@ export default function AppShell({ children }: { children: React.ReactNode }) {
   function handleLogin(e: React.FormEvent) {
     e.preventDefault();
     if (passwordInput.trim() === expectedPassword) {
+      document.cookie = "leadhunter_auth_session=authenticated; path=/; max-age=86400; SameSite=Lax";
       sessionStorage.setItem("leadhunter_auth_token", "authenticated");
       setAuthenticated(true);
       setErrorMsg("");
     } else {
       setErrorMsg("Invalid password. Please try again.");
     }
-  }
-
-  function handleLogout() {
-    document.cookie = "leadhunter_auth_session=; path=/; expires=Thu, 01 Jan 1970 00:00:00 GMT";
-    sessionStorage.removeItem("leadhunter_auth_token");
-    localStorage.removeItem("leadhunter_auth_token");
-    window.location.href = "/login";
   }
 
   if (authenticated === null) {
@@ -182,13 +171,5 @@ export default function AppShell({ children }: { children: React.ReactNode }) {
     );
   }
 
-  return (
-    <div className="app-shell">
-      <Sidebar open={open} onClose={() => setOpen(false)} />
-      <div className="main-shell">
-        <Topbar pathname={pathname} onMenu={() => setOpen(true)} onLogout={handleLogout} />
-        {children}
-      </div>
-    </div>
-  );
+  return <>{children}</>;
 }

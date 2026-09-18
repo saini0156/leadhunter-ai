@@ -1,114 +1,634 @@
-import Link from "next/link";
-import { ArrowUpRight, CheckCircle2, Globe2, Mail, PanelsTopLeft, Search, Users } from "lucide-react";
-import { activities, leads } from "../../../lib/data";
+"use client";
 
-const bars = [32, 47, 39, 61, 48, 72, 55, 82, 67, 90, 76, 96];
+import { useEffect } from "react";
+import Script from "next/script";
+
+const DASHBOARD_HTML = `
+    <!-- Top Global Header -->
+    <header class="top-nav">
+        <div class="nav-left">
+            <div class="app-brand">
+                <span class="brand-icon">⚡</span>
+                <span class="brand-title">LeadHunter<span>.AI</span></span>
+                <span class="version-badge">v1.0 Pro</span>
+            </div>
+            
+            <div class="active-params">
+                <div class="param-group">
+                    <label>📍 City:</label>
+                    <input type="text" id="targetCity" class="param-input" placeholder="e.g. Surat, Rajkot, Mumbai..." autocomplete="off" oninput="handleParamChange()" onchange="handleParamChange()">
+                </div>
+                <div class="param-group">
+                    <label>🌍 Country:</label>
+                    <input type="search" id="targetCountry" class="param-input" list="countryOptions" placeholder="Search country..." autocomplete="off" style="min-width: 150px;" oninput="handleParamChange()" onchange="handleParamChange()">
+                    <datalist id="countryOptions">
+                        <option value="Canada">🇨🇦 Canada</option>
+                        <option value="United Arab Emirates">🇦🇪 United Arab Emirates</option>
+                        <option value="Australia">🇦🇺 Australia</option>
+                        <option value="United Kingdom">🇬🇧 United Kingdom</option>
+                        <option value="United States">🇺🇸 United States</option>
+                        <option value="India">🇮🇳 India</option>
+                        <option value="Saudi Arabia">🇸🇦 Saudi Arabia</option>
+                        <option value="Qatar">🇶🇦 Qatar</option>
+                        <option value="New Zealand">🇳🇿 New Zealand</option>
+                        <option value="Germany">🇩🇪 Germany</option>
+                        <option value="France">🇫🇷 France</option>
+                        <option value="Singapore">🇸🇬 Singapore</option>
+                        <option value="Netherlands">🇳🇱 Netherlands</option>
+                        <option value="Ireland">🇮🇪 Ireland</option>
+                        <option value="Switzerland">🇨🇭 Switzerland</option>
+                        <option value="South Africa">🇿🇦 South Africa</option>
+                    </datalist>
+                </div>
+                <div class="param-group">
+                    <label>🎯 Service:</label>
+                    <select id="targetService" class="param-input" onchange="handleParamChange()">
+                        <option>Digital Marketing</option>
+                        <option>SEO</option>
+                        <option>Website Development</option>
+                        <option>Oracle ERP</option>
+                        <option>SEO + Website Development</option>
+                        <option>Digital Marketing + SEO</option>
+                        <option>All Services</option>
+                    </select>
+                    <label>🏷️ Category:</label>
+                    <input type="text" id="targetCategory" class="param-input" placeholder="e.g. Roofing, Real Estate, Oracle ERP..." autocomplete="off" oninput="handleParamChange()" onchange="handleParamChange()">
+                </div>
+                <div class="param-group">
+                    <label>🔢 Fetch Count:</label>
+                    <select id="targetLimit" class="param-input" style="cursor: pointer; min-width: 90px;" onchange="handleParamChange()">
+                        <option value="5">5 Leads</option>
+                        <option value="10" selected>10 Leads</option>
+                        <option value="20">20 Leads</option>
+                        <option value="30">30 Leads</option>
+                        <option value="50">50 Leads</option>
+                        <option value="100">100 Leads</option>
+                    </select>
+                </div>
+            </div>
+        </div>
+
+        <div class="nav-right">
+            <!-- Safety Switch -->
+            <div class="safety-toggle-box">
+                <span class="safety-label">Outreach Mode:</span>
+                <button id="dryRunToggle" class="mode-pill dry-run-active" onclick="toggleDryRun()">
+                    🛡️ DRY RUN ACTIVE
+                </button>
+            </div>
+
+            <!-- 1-Click Master Action -->
+            <button class="btn btn-gradient" id="btnRunFullPipeline" onclick="runStage('all')">
+                <span class="btn-icon">🚀</span> Run Full Pipeline
+            </button>
+        </div>
+    </header>
+
+    <!-- Main Application Container -->
+    <div class="dashboard-layout">
+        <!-- Sidebar Navigation -->
+        <aside class="sidebar">
+            <div class="sidebar-section-title">Navigation</div>
+            <nav class="nav-menu">
+                <button class="nav-item active" onclick="switchTab('overview')">
+                    <span class="nav-icon">📊</span> Pipeline Overview
+                </button>
+                <button class="nav-item" onclick="switchTab('approval')">
+                    <span class="nav-icon">⚖️</span> Human Approval Queue
+                    <span class="badge-count" id="pendingApprovalBadge">0</span>
+                </button>
+                <button class="nav-item" onclick="switchTab('leads')">
+                    <span class="nav-icon">👥</span> Lead Explorer Table
+                </button>
+                <button class="nav-item" onclick="switchTab('logs')">
+                    <span class="nav-icon">📜</span> Live Console Logs
+                </button>
+            </nav>
+
+            <div class="sidebar-section-title" style="margin-top: 32px;">Quick 1-Click Actions</div>
+            <div class="sidebar-actions">
+                <button class="action-btn" onclick="runStage('discover')">
+                    <span>🔍</span> Discover Leads
+                </button>
+                <button class="action-btn" onclick="runStage('verify')">
+                    <span>🌐</span> Verify Websites
+                </button>
+                <button class="action-btn" onclick="runStage('score')">
+                    <span>⭐</span> Score & Qualify
+                </button>
+                <button class="action-btn" onclick="runStage('personalize')">
+                    <span>✨</span> AI Personalize
+                </button>
+                <button class="action-btn" onclick="runStage('demo')">
+                    <span>🖥️</span> Generate Demos
+                </button>
+                <button class="action-btn" onclick="runStage('outreach')">
+                    <span>📨</span> Dispatch Outreach
+                </button>
+                <button class="action-btn" onclick="runStage('followup')">
+                    <span>🔄</span> Run Follow-ups
+                </button>
+                <button class="action-btn" onclick="runStage('sync')">
+                    <span>📑</span> Google Sheets Sync
+                </button>
+            </div>
+
+            <div class="sidebar-footer">
+                <div class="status-indicator">
+                    <span class="pulse-dot"></span> System Live • Cloud PostgreSQL
+                </div>
+            </div>
+        </aside>
+
+        <!-- Main Content Area -->
+        <main class="main-content">
+            <!-- Toast Notification Container -->
+            <div id="toastContainer" class="toast-container"></div>
+
+            <!-- Tab 1: Overview -->
+            <section id="tab-overview" class="tab-pane active">
+                <div class="section-header">
+                    <div>
+                        <h2>Pipeline Overview & Metrics</h2>
+                        <p class="subtitle">Real-time status of your B2B web design prospect pipeline in <span id="displayCity">Surat</span></p>
+                    </div>
+                    <button class="btn btn-outline btn-sm" onclick="refreshAllData()">
+                        🔄 Refresh Data
+                    </button>
+                </div>
+
+                <!-- Stats Grid -->
+                <div class="stats-grid">
+                    <div class="stat-card" style="--accent-color: #3b82f6;">
+                        <div class="stat-header">
+                            <span class="stat-title">Discovered</span>
+                            <span class="stat-icon">📍</span>
+                        </div>
+                        <div class="stat-value" id="statDiscovered">0</div>
+                        <div class="stat-footer">Google Maps & SerpAPI</div>
+                    </div>
+
+                    <div class="stat-card" style="--accent-color: #f97316;">
+                        <div class="stat-header">
+                            <span class="stat-title">🔥 HOT Leads</span>
+                            <span class="stat-icon">🔥</span>
+                        </div>
+                        <div class="stat-value" id="statHot">0</div>
+                        <div class="stat-footer">Score ≥ 70 (No Site / Broken)</div>
+                    </div>
+
+                    <div class="stat-card" style="--accent-color: #eab308;">
+                        <div class="stat-header">
+                            <span class="stat-title">⚡ WARM Leads</span>
+                            <span class="stat-icon">⚡</span>
+                        </div>
+                        <div class="stat-value" id="statWarm">0</div>
+                        <div class="stat-footer">Score 45–69</div>
+                    </div>
+
+                    <div class="stat-card" style="--accent-color: #06b6d4;">
+                        <div class="stat-header">
+                            <span class="stat-title">Demos Ready</span>
+                            <span class="stat-icon">🖥️</span>
+                        </div>
+                        <div class="stat-value" id="statDemoReady">0</div>
+                        <div class="stat-footer">Live Landing Page Previews</div>
+                    </div>
+
+                    <div class="stat-card" style="--accent-color: #ec4899;">
+                        <div class="stat-header">
+                            <span class="stat-title">Pending Approval</span>
+                            <span class="stat-icon">⏳</span>
+                        </div>
+                        <div class="stat-value" id="statPendingApproval">0</div>
+                        <div class="stat-footer">Awaiting Human Review</div>
+                    </div>
+
+                    <div class="stat-card" style="--accent-color: #10b981;">
+                        <div class="stat-header">
+                            <span class="stat-title">Outreach Dispatched</span>
+                            <span class="stat-icon">📬</span>
+                        </div>
+                        <div class="stat-value" id="statSent">0</div>
+                        <div class="stat-footer">Delivered / Dry Run Sent</div>
+                    </div>
+                </div>
+
+                <!-- Pipeline Stages Progress Matrix -->
+                <div class="card mt-6">
+                    <div class="card-header">
+                        <h3>⚡ Interactive Pipeline Control Matrix</h3>
+                        <span class="badge badge-info">Click any stage to execute instantly</span>
+                    </div>
+                    <div class="pipeline-flow">
+                        <div class="stage-step" onclick="runStage('discover')">
+                            <div class="step-badge">1</div>
+                            <div class="step-title">Discovery</div>
+                            <div class="step-desc">SerpAPI Maps</div>
+                            <button class="step-btn">Run Discovery</button>
+                        </div>
+                        <div class="step-arrow">➔</div>
+
+                        <div class="stage-step" onclick="runStage('verify')">
+                            <div class="step-badge">2</div>
+                            <div class="step-title">Verification</div>
+                            <div class="step-desc">HTTP Site Check</div>
+                            <button class="step-btn">Check Sites</button>
+                        </div>
+                        <div class="step-arrow">➔</div>
+
+                        <div class="stage-step" onclick="runStage('score')">
+                            <div class="step-badge">3</div>
+                            <div class="step-title">Scoring</div>
+                            <div class="step-desc">HOT/WARM/LOW</div>
+                            <button class="step-btn">Score Leads</button>
+                        </div>
+                        <div class="step-arrow">➔</div>
+
+                        <div class="stage-step" onclick="runStage('personalize')">
+                            <div class="step-badge">4</div>
+                            <div class="step-title">AI Copy</div>
+                            <div class="step-desc">Claude Sonnet</div>
+                            <button class="step-btn">Write Copy</button>
+                        </div>
+                        <div class="step-arrow">➔</div>
+
+                        <div class="stage-step" onclick="runStage('demo')">
+                            <div class="step-badge">5</div>
+                            <div class="step-title">Demo Pages</div>
+                            <div class="step-desc">Preview Sites</div>
+                            <button class="step-btn">Build Demos</button>
+                        </div>
+                        <div class="step-arrow">➔</div>
+
+                        <div class="stage-step" onclick="switchTab('approval')">
+                            <div class="step-badge">6</div>
+                            <div class="step-title">Approval</div>
+                            <div class="step-desc">Human Gate</div>
+                            <button class="step-btn highlight">Review Queue</button>
+                        </div>
+                        <div class="step-arrow">➔</div>
+
+                        <div class="stage-step" onclick="runStage('outreach')">
+                            <div class="step-badge">7</div>
+                            <div class="step-title">Outreach</div>
+                            <div class="step-desc">Email & WhatsApp</div>
+                            <button class="step-btn">Send Outreach</button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Recent Activity & High Priority Prospects Preview -->
+                <div class="grid-2 mt-6">
+                    <div class="card">
+                        <div class="card-header">
+                            <h3>🔥 Top Hot Prospects Ready for Action</h3>
+                            <button class="btn btn-sm btn-ghost" onclick="switchTab('leads')">View All →</button>
+                        </div>
+                        <div id="hotProspectsList" class="compact-lead-list">
+                            <div class="empty-state">Loading prospects...</div>
+                        </div>
+                    </div>
+
+                    <div class="card">
+                        <div class="card-header">
+                            <h3>📜 Live Activity Stream</h3>
+                            <button class="btn btn-sm btn-ghost" onclick="switchTab('logs')">Full Console →</button>
+                        </div>
+                        <div id="recentLogsStream" class="log-stream-box">
+                            <div class="log-line">Initializing LeadHunter AI Dashboard...</div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Tab 2: Human Approval Queue -->
+            <section id="tab-approval" class="tab-pane">
+                <div class="section-header">
+                    <div>
+                        <h2>⚖️ Human Approval Gateway</h2>
+                        <p class="subtitle">Review AI-generated cold copy, demo sites, and business context before dispatching</p>
+                    </div>
+                    <div class="flex-actions">
+                        <button class="btn btn-success" onclick="approveAllPending()">
+                            ✅ Approve All Pending
+                        </button>
+                        <button class="btn btn-outline" onclick="loadApprovalQueue()">
+                            🔄 Refresh Queue
+                        </button>
+                    </div>
+                </div>
+
+                <div id="approvalQueueContainer" class="approval-cards-grid">
+                    <div class="empty-state">No leads currently pending approval.</div>
+                </div>
+            </section>
+
+            <!-- Tab 3: Lead Explorer Table -->
+            <section id="tab-leads" class="tab-pane">
+                <div class="section-header">
+                    <div>
+                        <h2>👥 Lead Explorer & Database</h2>
+                        <p class="subtitle">Full repository of discovered, scored, and contacted local businesses</p>
+                    </div>
+                    <button class="btn btn-outline btn-sm" onclick="exportToCsv()">
+                        📥 Export to CSV
+                    </button>
+                </div>
+
+                <!-- Filter & Search Toolbar -->
+                <div class="toolbar-card">
+                    <div class="toolbar-top">
+                        <div class="search-box">
+                            <span class="search-icon">🔍</span>
+                            <input type="text" id="leadSearchInput" placeholder="Search by name, phone, city, category, address or ID..." oninput="filterLeadsTable()">
+                            <button type="button" class="btn-clear-search" id="clearSearchBtn" onclick="clearSearchInput()" title="Clear search">✕</button>
+                        </div>
+                        <div class="toolbar-top-right">
+                            <span class="counter-badge" id="tableCounterText">Showing all leads</span>
+                            <button class="btn btn-outline btn-sm" onclick="exportToCsv()">
+                                📥 Export to CSV
+                            </button>
+                            <button class="btn btn-danger-outline btn-sm" onclick="confirmDeleteAllLeads()" title="Delete all leads in database">
+                                ⚠️ Delete All Leads
+                            </button>
+                        </div>
+                    </div>
+
+                    <div class="filters-row">
+                        <select id="filterCountry" onchange="filterLeadsTable()" class="select-input">
+                            <option value="">All Countries</option>
+                            <option value="Canada">🇨🇦 Canada</option>
+                            <option value="India">🇮🇳 India</option>
+                            <option value="Other">Other</option>
+                        </select>
+
+                        <select id="filterCity" onchange="filterLeadsTable()" class="select-input">
+                            <option value="">All Cities</option>
+                        </select>
+
+                        <select id="filterCategory" onchange="filterLeadsTable()" class="select-input">
+                            <option value="">All Categories</option>
+                        </select>
+
+                        <select id="filterTier" onchange="filterLeadsTable()" class="select-input">
+                            <option value="">All Tiers</option>
+                            <option value="HOT">🔥 HOT Tier</option>
+                            <option value="WARM">⚡ WARM Tier</option>
+                            <option value="LOW">❄️ LOW Tier</option>
+                        </select>
+
+                        <select id="filterStatus" onchange="filterLeadsTable()" class="select-input">
+                            <option value="">All Statuses</option>
+                            <option value="DISCOVERED">DISCOVERED</option>
+                            <option value="VERIFIED">VERIFIED</option>
+                            <option value="QUALIFIED">QUALIFIED</option>
+                            <option value="PERSONALIZED">PERSONALIZED</option>
+                            <option value="DEMO_READY">DEMO_READY</option>
+                            <option value="PENDING_APPROVAL">PENDING_APPROVAL</option>
+                            <option value="APPROVED">APPROVED</option>
+                            <option value="DRY_RUN_SENT">DRY_RUN_SENT</option>
+                            <option value="SENT">SENT</option>
+                            <option value="COLD">COLD</option>
+                            <option value="REJECTED">REJECTED</option>
+                        </select>
+
+                        <select id="filterWebsiteStatus" onchange="filterLeadsTable()" class="select-input">
+                            <option value="">All Website Statuses</option>
+                            <option value="NO_WEBSITE">NO_WEBSITE</option>
+                            <option value="BROKEN_WEBSITE">BROKEN_WEBSITE</option>
+                            <option value="SOCIAL_ONLY">SOCIAL_ONLY</option>
+                            <option value="DIRECTORY_ONLY">DIRECTORY_ONLY</option>
+                            <option value="VALID_WEBSITE">VALID_WEBSITE</option>
+                            <option value="UNKNOWN">UNKNOWN</option>
+                        </select>
+
+                        <button class="btn btn-outline btn-sm btn-reset-filters" onclick="resetTableFilters()">🔄 Reset Filters</button>
+                    </div>
+                </div>
+
+                <!-- Floating Bulk Actions Bar -->
+                <div id="bulkActionsBar" class="bulk-actions-bar" style="display: none;">
+                    <div class="bulk-left">
+                        <span class="bulk-badge">☑️ <span id="selectedLeadsCount">0</span> selected</span>
+                    </div>
+                    <div class="bulk-right">
+                        <button class="btn btn-sm btn-outline" onclick="deselectAllLeads()">Deselect All</button>
+                        <button class="btn btn-sm btn-danger" onclick="deleteSelectedLeads()">
+                            🗑️ Delete Selected (<span id="deleteSelectedBtnCount">0</span>)
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Table Container -->
+                <div class="table-container">
+                    <table class="leads-table">
+                        <thead>
+                            <tr>
+                                <th style="width: 40px; text-align: center;">
+                                    <input type="checkbox" id="selectAllCheckbox" onchange="toggleSelectAllLeads(event)" class="table-checkbox" title="Select All">
+                                </th>
+                                <th style="width: 70px;">#</th>
+                                <th>Business Name</th>
+                                <th>Category</th>
+                                <th>City</th>
+                                <th>Website Status</th>
+                                <th>Score & Tier</th>
+                                <th>Lifecycle Status</th>
+                                <th>Demo Page</th>
+                                <th style="min-width: 190px;">Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody id="leadsTableBody">
+                            <tr>
+                                <td colspan="9" class="text-center">Loading database leads...</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </section>
+
+            <!-- Tab 4: Live Logs Console -->
+            <section id="tab-logs" class="tab-pane">
+                <div class="section-header">
+                    <div>
+                        <h2>📜 Live Execution Console</h2>
+                        <p class="subtitle">Real-time system telemetry and stage execution output</p>
+                    </div>
+                    <div class="flex-actions">
+                        <button class="btn btn-outline btn-sm" onclick="clearConsoleView()">Clear View</button>
+                        <button class="btn btn-outline btn-sm" onclick="fetchLiveLogs()">🔄 Refresh Logs</button>
+                    </div>
+                </div>
+
+                <div class="console-box" id="fullConsoleLogs">
+                    <pre class="console-text">[System] Log console initialized.</pre>
+                </div>
+            </section>
+        </main>
+    </div>
+
+    <!-- Modal 1: Lead Detail Inspector -->
+    <div id="leadModal" class="modal-backdrop" onclick="closeModalOnBackdrop(event, 'leadModal')">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 id="modalLeadName">Lead Details</h3>
+                <button class="close-modal-btn" onclick="closeModal('leadModal')">✕</button>
+            </div>
+            <div class="modal-body" id="modalLeadBody">
+                Loading...
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal 2: Live Demo Landing Page Preview -->
+    <div id="demoModal" class="modal-backdrop" onclick="closeModalOnBackdrop(event, 'demoModal')">
+        <div class="modal-content modal-lg">
+            <div class="modal-header">
+                <div class="flex items-center gap-2">
+                    <span class="badge badge-success">Live Website Preview</span>
+                    <span id="modalDemoTitle" style="font-weight: 700;">Demo Website</span>
+                </div>
+                <div class="flex items-center gap-3">
+                    <a id="modalDemoExternalLink" href="#" target="_blank" class="btn btn-outline btn-sm">🔗 Open in New Tab</a>
+                    <button class="close-modal-btn" onclick="closeModal('demoModal')">✕</button>
+                </div>
+            </div>
+            <div class="modal-body p-0">
+                <iframe id="demoPreviewFrame" src="" class="demo-iframe"></iframe>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal 3: Edit Lead Modal -->
+    <div id="editLeadModal" class="modal-backdrop" onclick="closeModalOnBackdrop(event, 'editLeadModal')">
+        <div class="modal-content modal-md">
+            <div class="modal-header">
+                <div class="flex items-center gap-2">
+                    <span class="badge badge-hot">✏️ Edit Lead</span>
+                    <span id="editLeadHeaderTitle" style="font-weight: 700; font-size: 1.05rem;">Edit Business</span>
+                </div>
+                <button class="close-modal-btn" onclick="closeModal('editLeadModal')">✕</button>
+            </div>
+            <div class="modal-body">
+                <form id="editLeadForm" onsubmit="handleSaveEditLead(event)" class="edit-lead-form">
+                    <input type="hidden" id="editLeadId">
+
+                    <div class="form-grid-2">
+                        <div class="form-group">
+                            <label>Business Name <span style="color: #ef4444;">*</span></label>
+                            <input type="text" id="editLeadName" required class="modal-input">
+                        </div>
+                        <div class="form-group">
+                            <label>Category <span style="color: #ef4444;">*</span></label>
+                            <input type="text" id="editLeadCategory" required class="modal-input">
+                        </div>
+                    </div>
+
+                    <div class="form-grid-2">
+                        <div class="form-group">
+                            <label>City <span style="color: #ef4444;">*</span></label>
+                            <input type="text" id="editLeadCity" required class="modal-input">
+                        </div>
+                        <div class="form-group">
+                            <label>Phone Number</label>
+                            <input type="text" id="editLeadPhone" class="modal-input">
+                        </div>
+                    </div>
+
+                    <div class="form-grid-2">
+                        <div class="form-group">
+                            <label>Website URL</label>
+                            <input type="text" id="editLeadWebsite" class="modal-input" placeholder="https://example.com">
+                        </div>
+                        <div class="form-group">
+                            <label>Email Address</label>
+                            <input type="email" id="editLeadEmail" class="modal-input" placeholder="contact@example.com">
+                        </div>
+                    </div>
+
+                    <div class="form-grid-3">
+                        <div class="form-group">
+                            <label>Website Status</label>
+                            <select id="editLeadWebsiteStatus" class="modal-input">
+                                <option value="NO_WEBSITE">NO_WEBSITE</option>
+                                <option value="BROKEN_WEBSITE">BROKEN_WEBSITE</option>
+                                <option value="SOCIAL_ONLY">SOCIAL_ONLY</option>
+                                <option value="DIRECTORY_ONLY">DIRECTORY_ONLY</option>
+                                <option value="VALID_WEBSITE">VALID_WEBSITE</option>
+                                <option value="PENDING">PENDING</option>
+                                <option value="UNKNOWN">UNKNOWN</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label>Lead Tier</label>
+                            <select id="editLeadTier" class="modal-input">
+                                <option value="HOT">🔥 HOT (Score ≥ 70)</option>
+                                <option value="WARM">⚡ WARM (Score ≥ 50)</option>
+                                <option value="LOW">❄️ LOW (Score &lt; 50)</option>
+                                <option value="">None / Unscored</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label>Score (0-100)</label>
+                            <input type="number" id="editLeadScore" min="0" max="100" class="modal-input">
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label>Lifecycle Status</label>
+                        <select id="editLeadStatus" class="modal-input">
+                            <option value="DISCOVERED">DISCOVERED</option>
+                            <option value="VERIFIED">VERIFIED</option>
+                            <option value="QUALIFIED">QUALIFIED</option>
+                            <option value="PERSONALIZED">PERSONALIZED</option>
+                            <option value="DEMO_READY">DEMO_READY</option>
+                            <option value="PENDING_APPROVAL">PENDING_APPROVAL</option>
+                            <option value="APPROVED">APPROVED</option>
+                            <option value="DRY_RUN_SENT">DRY_RUN_SENT</option>
+                            <option value="SENT">SENT</option>
+                            <option value="REJECTED">REJECTED</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group">
+                        <label>Physical Address</label>
+                        <input type="text" id="editLeadAddress" class="modal-input">
+                    </div>
+
+                    <div class="form-group">
+                        <label>Custom WhatsApp Outreach Pitch</label>
+                        <textarea id="editLeadWhatsAppMessage" rows="3" class="modal-input" placeholder="Personalized pitch text..."></textarea>
+                    </div>
+
+                    <div class="modal-actions-row">
+                        <button type="button" class="btn btn-outline" onclick="closeModal('editLeadModal')">Cancel</button>
+                        <button type="submit" class="btn btn-gradient" id="btnSaveEditLead">💾 Save Changes</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+`;
 
 export default function DashboardPage() {
-  const qualified = leads.filter(x => x.qualified).length;
-  const hot = leads.filter(x => x.tier === "HOT").length;
-  const noWebsite = leads.filter(x => x.websiteStatus === "No Website").length;
+  useEffect(() => {
+    // If dashboard script is already loaded, trigger initial refresh
+    if (typeof window !== "undefined" && (window as any).refreshAllData) {
+      (window as any).refreshAllData();
+    }
+  }, []);
 
   return (
-    <main className="page">
-      <div className="page-header">
-        <div>
-          <div className="page-title">Good morning 👋</div>
-          <div className="page-description">Here&apos;s what&apos;s happening with your lead generation today.</div>
-        </div>
-        <Link className="primary-btn" href="/discover"><Search size={15} /> Discover Leads</Link>
-      </div>
-
-      <div className="kpi-grid">
-        {[
-          { label: "Total Leads", value: "248", change: "+18.4%", foot: "vs last month", icon: Users },
-          { label: "Qualified Leads", value: String(qualified + 80), change: "+12.8%", foot: "34.7% qualification rate", icon: CheckCircle2 },
-          { label: "Demo Websites", value: "42", change: "+9.2%", foot: "12 awaiting approval", icon: PanelsTopLeft },
-          { label: "Enquiries", value: "17", change: "+24.1%", foot: "from generated demos", icon: Mail }
-        ].map(({ label, value, change, foot, icon: Icon }) => (
-          <div className="kpi-card" key={label}>
-            <div className="kpi-top">
-              <div>
-                <div className="kpi-label">{label}</div>
-                <div className="kpi-value">{value}</div>
-              </div>
-              <div className="kpi-icon"><Icon size={18} /></div>
-            </div>
-            <div className="kpi-foot"><span className="up">{change}</span><span className="muted">{foot}</span></div>
-          </div>
-        ))}
-      </div>
-
-      <div className="grid-2">
-        <section className="panel">
-          <div className="panel-header">
-            <div><div className="panel-title">Lead Pipeline</div><div className="panel-subtitle">Current lead distribution</div></div>
-            <select className="select"><option>Last 30 days</option><option>Last 7 days</option><option>This year</option></select>
-          </div>
-          <div className="chart">
-            <div className="chart-bars">
-              {bars.map((height, i) => <div className="bar-wrap" key={i}><div className="bar" style={{ height: `${height}%` }} /></div>)}
-            </div>
-            <div className="chart-labels">{["Apr","","","May","","","Jun","","","Sep","",""].map((x,i)=><span key={i}>{x}</span>)}</div>
-          </div>
-        </section>
-
-        <section className="panel">
-          <div className="panel-header">
-            <div><div className="panel-title">Recent Activity</div><div className="panel-subtitle">Latest automation events</div></div>
-          </div>
-          <div className="activity-list">
-            {activities.map(([icon,title,business,time]) => (
-              <div className="activity" key={title + business}>
-                <div className="activity-icon">{icon}</div>
-                <div className="activity-main"><div className="activity-title">{title}</div><div className="activity-business">{business}</div></div>
-                <div className="activity-time">{time}</div>
-              </div>
-            ))}
-          </div>
-        </section>
-      </div>
-
-      <section className="panel table-panel">
-        <div className="panel-header">
-          <div><div className="panel-title">Priority Leads</div><div className="panel-subtitle">Highest scoring leads requiring attention</div></div>
-          <Link href="/leads" className="secondary-btn">View all <ArrowUpRight size={13} /></Link>
-        </div>
-        <div className="table-wrap">
-          <table>
-            <thead><tr><th>Business</th><th>Category</th><th>Website</th><th>Score</th><th>Tier</th><th>Status</th><th /></tr></thead>
-            <tbody>
-              {leads.slice(0,5).map(lead => (
-                <tr key={lead.id}>
-                  <td><div className="business-cell"><div className="business-avatar">{lead.name[0]}</div><div><div className="business-name">{lead.name}</div><div className="business-meta">{lead.city}</div></div></div></td>
-                  <td className="cell-text">{lead.category}</td>
-                  <td><span className={`badge ${lead.websiteStatus === "No Website" ? "badge-hot" : "badge-gray"}`}>{lead.websiteStatus}</span></td>
-                  <td><div className="score"><div className="score-track"><div className="score-fill" style={{width:`${lead.score}%`}} /></div><span className="score-value">{lead.score}</span></div></td>
-                  <td><span className={`badge badge-${lead.tier.toLowerCase()}`}>{lead.tier}</span></td>
-                  <td><span className={`badge ${lead.qualified ? "badge-green" : "badge-gray"}`}>{lead.status}</span></td>
-                  <td><Link href={`/leads/${lead.id}`} className="secondary-btn" style={{height:32,padding:"0 10px"}}>View</Link></td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
-      </section>
-
-      <div className="grid-3" style={{marginTop:20}}>
-        {[
-          ["Lead Discovery", "Automation is running normally.", "green"],
-          ["Website Generation", "3 demos generated today.", "green"],
-          ["Outreach", `${hot + 9} leads waiting for approval.`, "yellow"]
-        ].map(([title,text,state]) => (
-          <div className="panel" style={{padding:18}} key={title}>
-            <div style={{display:"flex",alignItems:"center",gap:8,fontSize:12,fontWeight:700}}>
-              <span style={{width:8,height:8,borderRadius:"50%",background:state==="green"?"#10b981":"#f59e0b"}} />
-              {title}
-            </div>
-            <div className="muted" style={{fontSize:10,marginTop:10}}>{text}</div>
-          </div>
-        ))}
-      </div>
-    </main>
+    <>
+      <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700;800&family=Plus+Jakarta+Sans:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" />
+      <link rel="stylesheet" href="/static/css/dashboard.css" />
+      <div dangerouslySetInnerHTML={{ __html: DASHBOARD_HTML }} />
+      <Script src="/static/js/dashboard.js" strategy="afterInteractive" onLoad={() => {
+        if (typeof window !== "undefined" && (window as any).refreshAllData) {
+          (window as any).refreshAllData();
+        }
+      }} />
+    </>
   );
 }
