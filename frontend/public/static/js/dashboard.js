@@ -173,12 +173,23 @@ async function refreshAllData() {
     await Promise.all([fetchStats(), loadLeadsTable(), loadApprovalQueue(), fetchLiveLogs()]);
 }
 
+async function safeFetchJson(url, options = {}) {
+    const res = await fetch(url, options);
+    const text = await res.text();
+    let data;
+    try {
+        data = JSON.parse(text);
+    } catch (e) {
+        throw new Error(`Server returned status ${res.status}: ${text.slice(0, 100)}`);
+    }
+    return data;
+}
+
 // Fetch Pipeline Stats
 async function fetchStats() {
     try {
         const city = getCity();
-        const res = await fetch(`/api/stats?city=${encodeURIComponent(city)}`);
-        const data = await res.json();
+        const data = await safeFetchJson(`/api/stats?city=${encodeURIComponent(city)}`);
         if (data.status === "ok") {
             const s = data.stats;
             const setVal = (id, val) => { const el = document.getElementById(id); if (el) el.innerText = val; };
@@ -202,38 +213,71 @@ async function runStage(stage) {
     const city = getCity();
     const category = getCategory();
     const service = getService();
+    const country = getCountry();
     const limit = getLimit();
-    showToast(`Executing Stage: ${stage.toUpperCase()} (${limit} leads) for ${category} in ${city}...`, "info");
-
     const btn = document.getElementById("btnRunFullPipeline");
-    if (btn && stage === "all") {
-        btn.innerHTML = `<span class="btn-icon">⏳</span> Executing (${limit} Leads)...`;
-        btn.disabled = true;
+
+    if (stage === "all") {
+        if (btn) {
+            btn.innerHTML = `<span class="btn-icon">⏳</span> Executing Pipeline...`;
+            btn.disabled = true;
+        }
+        const stages = [
+            { name: "discover", label: "Discovery" },
+            { name: "verify", label: "Verification" },
+            { name: "score", label: "Scoring" },
+            { name: "personalize", label: "AI Copy" },
+            { name: "demo", label: "Demo Previews" },
+            { name: "approval", label: "Approval Queue" },
+            { name: "sync", label: "Sheets Sync" }
+        ];
+        try {
+            for (let i = 0; i < stages.length; i++) {
+                const stg = stages[i];
+                showToast(`🚀 [${i + 1}/${stages.length}] Stage: ${stg.label}...`, "info");
+                const result = await safeFetchJson(`/api/pipeline/run-stage`, {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({ stage: stg.name, city, category, country, service, limit })
+                });
+                if (result.status !== "ok") {
+                    showToast(`Stage [${stg.label}] warning: ${result.error || result.message}`, "error");
+                }
+                await fetchStats();
+            }
+            showToast(`✅ Full Pipeline Executed Successfully! All stages complete.`, "success");
+            await refreshAllData();
+            setTimeout(() => switchTab("approval"), 500);
+        } catch (err) {
+            showToast(`Pipeline Execution Error: ${err.message || err}`, "error");
+        } finally {
+            if (btn) {
+                btn.innerHTML = `<span class="btn-icon">🚀</span> Run Full Pipeline`;
+                btn.disabled = false;
+            }
+        }
+        return;
     }
 
+    showToast(`Executing Stage: ${stage.toUpperCase()} (${limit} leads) for ${category} in ${city}...`, "info");
+
     try {
-        const res = await fetch(`/api/pipeline/run-stage`, {
+        const result = await safeFetchJson(`/api/pipeline/run-stage`, {
             method: "POST",
             headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({ stage, city, category, country: getCountry(), service, limit })
+            body: JSON.stringify({ stage, city, category, country, service, limit })
         });
-        const result = await res.json();
         if (result.status === "ok") {
             showToast(result.message || `Stage [${stage.toUpperCase()}] completed successfully!`, "success");
             await refreshAllData();
-            if (stage === "all" || stage === "approval") {
+            if (stage === "approval") {
                 setTimeout(() => switchTab("approval"), 500);
             }
         } else {
             showToast(`Stage [${stage.toUpperCase()}] error: ${result.error || result.message}`, "error");
         }
     } catch (err) {
-        showToast(`Failed to execute stage ${stage}: ${err}`, "error");
-    } finally {
-        if (btn && stage === "all") {
-            btn.innerHTML = `<span class="btn-icon">🚀</span> Run Full Pipeline`;
-            btn.disabled = false;
-        }
+        showToast(`Failed to execute stage ${stage}: ${err.message || err}`, "error");
     }
 }
 
