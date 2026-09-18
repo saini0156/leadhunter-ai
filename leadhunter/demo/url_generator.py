@@ -77,25 +77,11 @@ def build_demo_slug(lead: Any) -> str:
 # ---------------------------------------------------------------------------
 
 def get_demo_base_url() -> str:
-
-    base_url = os.getenv(
-        "DEMO_BASE_URL",
-        "http://127.0.0.1:8500",
-    ).strip()
-
-    base_url = base_url.rstrip("/")
-
-    # If someone accidentally puts /preview
-    # in DEMO_BASE_URL, remove it.
-
-    if base_url.endswith(
-        "/preview"
-    ):
-
-        base_url = base_url[
-            :-len("/preview")
-        ]
-
+    base_url = os.getenv("DEMO_BASE_URL", "").strip().rstrip("/")
+    if not base_url or "trycloudflare.com" in base_url or "ngrok" in base_url or "127.0.0.1" in base_url or "localhost" in base_url:
+        return ""
+    if base_url.endswith("/preview"):
+        base_url = base_url[:-len("/preview")]
     return base_url.rstrip("/")
 
 
