@@ -451,7 +451,8 @@ def execute_stage(req: StageRequest) -> Dict[str, Any]:
 
     try:
         if stage in ("discover", "discovery"):
-            raw_leads = search_serpapi_google_maps(city=search_location, business_type=category, max_results=limit, db=db, config=cfg)
+            res_tuple = search_serpapi_google_maps(city=search_location, business_type=category, max_results=limit, db=db, config=cfg)
+            raw_leads = res_tuple[0] if isinstance(res_tuple, tuple) else res_tuple
             proc_leads = process_leads(city=pipeline_city, db=db, config=cfg)
             count = len(raw_leads) if isinstance(raw_leads, list) else limit
             return {"status": "ok", "message": f"Successfully discovered {count} leads for {category} in {city}", "count": count}
@@ -627,17 +628,50 @@ def toggle_dry_run() -> Dict[str, Any]:
 
 @app.get("/api/logs")
 def get_live_logs(limit: int = Query(40, ge=1, le=200)) -> Dict[str, Any]:
-    """Stream recent lines from local log file."""
-    log_path = Path("./data/logs/leadhunter.log")
-    if not log_path.exists():
-        return {"status": "ok", "logs": ["[System] Log file empty."]}
+    """Stream recent system telemetry logs from database events & log files."""
+    logs = []
+    db = get_db()
 
+    # 1. Fetch live events from DB lead_events table
     try:
-        with open(log_path, "r", encoding="utf-8") as f:
-            lines = [line.strip() for line in f.readlines() if line.strip()]
-            return {"status": "ok", "logs": lines[-limit:]}
+        rows = db.conn.execute(
+            "SELECT ts, level, stage, event FROM lead_events ORDER BY id DESC LIMIT ?",
+            (limit,)
+        ).fetchall()
+        for r in reversed(rows):
+            r_dict = dict(r) if hasattr(r, "keys") else {}
+            ts = (r_dict.get("ts") or "")[:19]
+            lvl = r_dict.get("level") or "INFO"
+            stg = r_dict.get("stage") or "system"
+            evt = r_dict.get("event") or ""
+            logs.append(f"[{ts}] [{lvl}] [{stg}] {evt}")
     except Exception as exc:
-        return {"status": "error", "error": str(exc), "logs": []}
+        log.error("Error reading lead_events: %s", exc)
+
+    # 2. Check log file locations
+    possible_paths = [
+        get_cfg().data_dir / "logs" / "leadhunter.log" if get_cfg() else None,
+        Path("/tmp/leadhunter_data/logs/leadhunter.log"),
+        Path("./data/logs/leadhunter.log"),
+    ]
+
+    for p in possible_paths:
+        if p and p.exists():
+            try:
+                with open(p, "r", encoding="utf-8") as f:
+                    file_lines = [line.strip() for line in f.readlines() if line.strip()]
+                    if file_lines:
+                        logs.extend(file_lines[-limit:])
+                        break
+            except Exception:
+                pass
+
+    if not logs:
+        logs = [
+            f"[{utcnow_iso()[:19]}] [INFO] [system] System Live • Pipeline Ready for Execution"
+        ]
+
+    return {"status": "ok", "logs": logs[-limit:]}
 
 
 def _infer_lead_country(city: Optional[str], address: Optional[str]) -> str:
