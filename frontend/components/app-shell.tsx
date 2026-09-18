@@ -17,7 +17,7 @@ export default function AppShell({ children }: { children: React.ReactNode }) {
   const expectedPassword = process.env.NEXT_PUBLIC_DASHBOARD_PASSWORD || "admin123";
 
   useEffect(() => {
-    const authSaved = localStorage.getItem("leadhunter_auth_token");
+    const authSaved = sessionStorage.getItem("leadhunter_auth_token");
     if (authSaved === "authenticated") {
       setAuthenticated(true);
     } else {
@@ -28,7 +28,7 @@ export default function AppShell({ children }: { children: React.ReactNode }) {
   function handleLogin(e: React.FormEvent) {
     e.preventDefault();
     if (passwordInput.trim() === expectedPassword) {
-      localStorage.setItem("leadhunter_auth_token", "authenticated");
+      sessionStorage.setItem("leadhunter_auth_token", "authenticated");
       setAuthenticated(true);
       setErrorMsg("");
     } else {
@@ -37,9 +37,10 @@ export default function AppShell({ children }: { children: React.ReactNode }) {
   }
 
   function handleLogout() {
+    document.cookie = "leadhunter_auth_session=; path=/; expires=Thu, 01 Jan 1970 00:00:00 GMT";
+    sessionStorage.removeItem("leadhunter_auth_token");
     localStorage.removeItem("leadhunter_auth_token");
-    setAuthenticated(false);
-    setPasswordInput("");
+    window.location.href = "/login";
   }
 
   if (authenticated === null) {
