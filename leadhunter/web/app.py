@@ -96,11 +96,47 @@ def get_cfg() -> Optional[Config]:
 # Page Views & Demo Previews
 # --------------------------------------------------------------------------
 
+EXPECTED_PASSWORD = os.getenv("DASHBOARD_PASSWORD") or os.getenv("NEXT_PUBLIC_DASHBOARD_PASSWORD") or "admin123"
+
+@app.get("/login", response_class=HTMLResponse)
+def serve_login(request: Request):
+    """Render admin security login page."""
+    return templates.TemplateResponse(request=request, name="login.html", context={})
+
+
+class LoginRequest(BaseModel):
+    password: str
+
+
+@app.post("/login")
+def process_login(body: LoginRequest):
+    """Validate admin password and set session cookie."""
+    if body.password and body.password.strip() == EXPECTED_PASSWORD:
+        resp = JSONResponse(content={"status": "ok", "message": "Authenticated successfully"})
+        resp.set_cookie(key="leadhunter_auth_session", value="authenticated", max_age=86400, httponly=False, samesite="lax")
+        return resp
+    return JSONResponse(status_code=401, content={"status": "error", "message": "Invalid password. Please try again."})
+
+
+@app.get("/logout")
+def process_logout():
+    """Clear session cookie and redirect to login."""
+    from fastapi.responses import RedirectResponse
+    resp = RedirectResponse(url="/login", status_code=302)
+    resp.delete_cookie(key="leadhunter_auth_session")
+    return resp
+
+
 @app.get("/", response_class=HTMLResponse)
 @app.get("/dashboard", response_class=HTMLResponse)
 def serve_dashboard(request: Request):
-    """Render main web control dashboard."""
+    """Render main web control dashboard with session protection."""
+    from fastapi.responses import RedirectResponse
+    auth_cookie = request.cookies.get("leadhunter_auth_session")
+    if not auth_cookie or auth_cookie != "authenticated":
+        return RedirectResponse(url="/login?from=/dashboard", status_code=302)
     return templates.TemplateResponse(request=request, name="dashboard.html", context={})
+
 
 
 @app.get("/preview", response_class=HTMLResponse)
