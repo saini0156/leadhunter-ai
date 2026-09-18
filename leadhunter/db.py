@@ -464,7 +464,12 @@ class Database:
         # SUPABASE / POSTGRESQL
         # ---------------------------------------------------------------
 
-        if path is None and database_url.startswith(
+        is_default_file = (
+            path is None
+            or str(path).replace("\\", "/").endswith("leadhunter.db")
+        )
+
+        if is_default_file and database_url.startswith(
             ("postgresql://", "postgres://")
         ):
 

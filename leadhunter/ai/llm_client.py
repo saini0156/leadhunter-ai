@@ -72,16 +72,24 @@ class LLMClient:
         api_key: Optional[str] = None,
         base_url: Optional[str] = None,
     ):
-        self.provider = (
-            provider
-            or os.getenv("LLM_PROVIDER")
-            or "groq"
-        ).strip().lower()
+        env_provider = (provider or os.getenv("LLM_PROVIDER") or "").strip().lower()
+        if not env_provider:
+            if os.getenv("GROQ_API_KEY"):
+                env_provider = "groq"
+            elif os.getenv("GEMINI_API_KEY"):
+                env_provider = "gemini"
+            elif os.getenv("OPENAI_API_KEY"):
+                env_provider = "openai"
+            else:
+                env_provider = "groq"
 
+        self.provider = env_provider
+
+        default_model = "gemini-2.5-flash" if self.provider == "gemini" else "openai/gpt-oss-20b"
         self.model = (
             model
             or os.getenv("LLM_MODEL")
-            or "openai/gpt-oss-20b"
+            or default_model
         ).strip()
 
         self.api_key = (
