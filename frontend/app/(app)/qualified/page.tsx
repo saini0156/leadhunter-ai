@@ -1,6 +1,6 @@
 import Link from "next/link";
 import { CheckCircle2, ExternalLink } from "lucide-react";
-import { leads } from "@/lib/data";
+import { leads } from "../../../lib/data";
 
 export default function QualifiedPage() {
   const qualified = leads.filter(l=>l.qualified);

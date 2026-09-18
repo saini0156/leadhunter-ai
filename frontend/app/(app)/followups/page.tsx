@@ -1,5 +1,5 @@
 import { CalendarClock, CheckCircle2, Clock3 } from "lucide-react";
-import { leads } from "@/lib/data";
+import { leads } from "../../../lib/data";
 
 export default function FollowupsPage() {
   return (

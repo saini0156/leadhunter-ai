@@ -1,6 +1,6 @@
 import Link from "next/link";
 import { ExternalLink, PanelsTopLeft } from "lucide-react";
-import { leads } from "@/lib/data";
+import { leads } from "../../../lib/data";
 
 export default function DemosPage() {
   const demos=leads.filter(l=>l.demoStatus==="READY"||l.demoStatus==="PENDING");

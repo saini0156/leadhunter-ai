@@ -1,6 +1,6 @@
 import Link from "next/link";
 import { ArrowUpRight, CheckCircle2, Globe2, Mail, PanelsTopLeft, Search, Users } from "lucide-react";
-import { activities, leads } from "@/lib/data";
+import { activities, leads } from "../../../lib/data";
 
 const bars = [32, 47, 39, 61, 48, 72, 55, 82, 67, 90, 76, 96];
 

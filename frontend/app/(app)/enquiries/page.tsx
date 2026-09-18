@@ -2,7 +2,7 @@
 
 import { Mail, Phone, Search } from "lucide-react";
 import { useState } from "react";
-import { enquiries } from "@/lib/data";
+import { enquiries } from "../../../lib/data";
 
 export default function EnquiriesPage() {
   const [query,setQuery]=useState("");

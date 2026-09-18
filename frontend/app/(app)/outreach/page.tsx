@@ -1,5 +1,5 @@
 import { Mail, MessageCircle, Send, CheckCircle2 } from "lucide-react";
-import { leads } from "@/lib/data";
+import { leads } from "../../../lib/data";
 
 export default function OutreachPage() {
   const ready=leads.filter(l=>l.qualified);
