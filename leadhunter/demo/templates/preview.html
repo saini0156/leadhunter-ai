@@ -690,14 +690,20 @@
                     </h1>
 
                     <p class="hero-sub">
-                        Professional {{ business_profile.business_type }} solutions for homeowners and commercial property owners in {{ business_profile.city }}. Guaranteed workmanship and transparent pricing.
+                        {{ business_profile.hero_desc or ("Top-quality " + business_profile.business_type + " solutions in " + business_profile.city + ". Guaranteed satisfaction and transparent pricing.") }}
                     </p>
 
                     <div class="hero-checklist">
-                        <div class="check-item"><span class="check-icon">✓</span> 100% Free & Fast Quotes</div>
-                        <div class="check-item"><span class="check-icon">✓</span> Vetted & Licensed Pros</div>
-                        <div class="check-item"><span class="check-icon">✓</span> Transparent Pricing</div>
-                        <div class="check-item"><span class="check-icon">✓</span> Local {{ business_profile.city }} Service</div>
+                        {% if business_profile.checklist %}
+                            {% for item in business_profile.checklist %}
+                            <div class="check-item"><span class="check-icon">✓</span> {{ item }}</div>
+                            {% endfor %}
+                        {% else %}
+                            <div class="check-item"><span class="check-icon">✓</span> 100% Free Consultation</div>
+                            <div class="check-item"><span class="check-icon">✓</span> Certified Specialists</div>
+                            <div class="check-item"><span class="check-icon">✓</span> Transparent Pricing</div>
+                            <div class="check-item"><span class="check-icon">✓</span> Local {{ business_profile.city }} Service</div>
+                        {% endif %}
                     </div>
                 </div>
 
@@ -790,7 +796,7 @@
                 <div class="section-head">
                     <div class="section-tag">OUR SPECIALTIES</div>
                     <h2 class="section-title">Professional Services in {{ business_profile.city }}</h2>
-                    <p class="section-sub">Comprehensive solutions tailored specifically for your property needs.</p>
+                    <p class="section-sub">Comprehensive {{ business_profile.business_type }} solutions tailored specifically for your needs in {{ business_profile.city }}.</p>
                 </div>
 
                 <div class="services-grid">
@@ -827,7 +833,7 @@
                 <div class="calc-wrapper">
                     <div class="calc-grid">
                         <div>
-                            <label style="font-weight: 700; font-size: 15px;">Project Scope Size: <strong id="sizeValue" style="color: var(--accent);">1,800</strong> sq ft / units</label>
+                            <label style="font-weight: 700; font-size: 15px;">Service Scope Index: <strong id="sizeValue" style="color: var(--accent);">1,800</strong> units / score</label>
                             <input type="range" id="sizeSlider" min="500" max="5000" step="100" value="1800" class="range-slider" oninput="calculateEstimate()">
 
                             <label style="font-weight: 700; font-size: 15px; margin-top: 15px; display: block;">Service Quality Tier:</label>
@@ -856,8 +862,8 @@
             <div class="container">
                 <div class="section-head">
                     <div class="section-tag">TESTIMONIALS</div>
-                    <h2 class="section-title">What Local Homeowners Say</h2>
-                    <p class="section-sub">Verified feedback from recent customers in {{ business_profile.city }}.</p>
+                    <h2 class="section-title">What Local {{ business_profile.client_label or "Clients" }} Say</h2>
+                    <p class="section-sub">Verified feedback from recent {{ (business_profile.client_label or "clients")|lower }} in {{ business_profile.city }}.</p>
                 </div>
 
                 <div class="reviews-grid">
@@ -868,7 +874,7 @@
                             <div class="avatar">JD</div>
                             <div>
                                 <div class="reviewer-name">John D.</div>
-                                <div class="reviewer-loc">Homeowner in {{ business_profile.city }}</div>
+                                <div class="reviewer-loc">Verified Client in {{ business_profile.city }}</div>
                             </div>
                         </div>
                     </div>
@@ -880,7 +886,7 @@
                             <div class="avatar">MS</div>
                             <div>
                                 <div class="reviewer-name">Michael S.</div>
-                                <div class="reviewer-loc">Property Manager</div>
+                                <div class="reviewer-loc">Verified Reviewer</div>
                             </div>
                         </div>
                     </div>
@@ -906,7 +912,7 @@
     ========================================================= -->
     <div class="sticky-contact-bar">
         <div class="sticky-text">
-            <span>⚡ Ready for a Free Estimate in <strong>{{ business_profile.city }}</strong>?</span>
+            <span>⚡ Ready for a Free Consultation in <strong>{{ business_profile.city }}</strong>?</span>
         </div>
         <div class="sticky-actions">
             {% if business_profile.phone %}

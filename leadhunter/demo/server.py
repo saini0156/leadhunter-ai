@@ -303,13 +303,36 @@ def find_lead_by_slug_or_id(identifier: str):
 # Business profile
 # ---------------------------------------------------------------------------
 
+def clean_business_name(name: str, city: str = "") -> str:
+    if not name:
+        return "Local Business"
+    clean = name.strip()
+    if city:
+        p = re.escape(city.strip())
+        clean = re.sub(rf"[\s,\-\+]+{p}$", "", clean, flags=re.IGNORECASE)
+    clean = re.sub(r"[\s,\-\+]+(canada|bc|on|ab|surrey|vancouver|toronto|calgary|edmonton|seattle|ny|usa)$", "", clean, flags=re.IGNORECASE)
+    clean = re.sub(r"[\s,\-\+]+(canada|bc|on|ab|surrey|vancouver|toronto|calgary|edmonton|seattle|ny|usa)$", "", clean, flags=re.IGNORECASE)
+    return clean.strip() or name.strip()
+
+
+def clean_city_name(city: str) -> str:
+    if not city:
+        return "Surrey, BC"
+    c = city.strip()
+    parts = [p.strip().title() for p in c.split(",") if p.strip()]
+    if len(parts) == 1:
+        return parts[0]
+    return ", ".join(parts)
+
+
 def resolve_category_design(category: str, business_name: str, city: str) -> Dict[str, Any]:
     from leadhunter.demo.niche_engine import resolve_niche_data
 
-    c_str = city or "Surrey, BC"
-    target = f"{category or ''} {business_name or ''}"
-    b_name = business_name or "Local Business"
-    niche = resolve_niche_data(category=target, business_name=b_name, city=c_str)
+    c_clean = clean_city_name(city)
+    b_clean = clean_business_name(business_name, city=c_clean)
+    target = f"{category or ''} {b_clean}"
+
+    niche = resolve_niche_data(category=target, business_name=b_clean, city=c_clean)
 
     accent = niche.get("accent_hex", "#f97316")
 
@@ -338,11 +361,35 @@ def resolve_category_design(category: str, business_name: str, city: str) -> Dic
     else:
         services_list = ["Professional Consultation", "Expert Service Execution", "Guaranteed Workmanship"]
 
-    badge = niche.get("badge", f"Premier Services in {c_str}")
-    if c_str not in badge:
-        badge = f"{badge} in {c_str}"
+    badge = niche.get("badge", f"Premier Services in {c_clean}")
+    if c_clean not in badge:
+        badge = f"{badge} in {c_clean}"
 
-    headline = niche.get("hero_title", f"Top-Rated Services in {c_str}")
+    headline = niche.get("hero_title", f"Top-Rated Services in {c_clean}")
+    desc = niche.get("hero_desc", f"High-quality professional services in {c_clean}. Guaranteed satisfaction and transparent pricing.")
+
+    nkey = niche.get("niche_key", "business")
+    if nkey == "dental":
+        checklist = ["100% Painless Care", "Certified Dental Specialists", "Transparent Pricing", f"Local {c_clean} Clinic"]
+        client_label = "Patients"
+    elif nkey in ["cafe", "dining"]:
+        checklist = ["Fresh Local Ingredients", "Artisan Handcrafted", "Cozy Atmosphere", f"Top Rated in {c_clean}"]
+        client_label = "Guests & Diners"
+    elif nkey == "beauty":
+        checklist = ["100% Organic Products", "Master Stylists & Aestheticians", "Luxury Ambience", f"Premier {c_clean} Studio"]
+        client_label = "Clients"
+    elif nkey == "medical":
+        checklist = ["Minimally Invasive Tech", "Board Certified Specialists", "100% Sterile Facility", f"Trusted in {c_clean}"]
+        client_label = "Patients"
+    elif nkey in ["legal", "business"]:
+        checklist = ["100% Confidential Counsel", "15+ Years Track Record", "Transparent Fee Structure", f"Top Rated in {c_clean}"]
+        client_label = "Clients"
+    elif nkey == "realestate":
+        checklist = ["100% Verified Titles", "Zero Hidden Commission", "VIP Property Tours", f"Local {c_clean} Experts"]
+        client_label = "Home Buyers & Investors"
+    else:
+        checklist = ["100% Free & Fast Quotes", "Vetted & Licensed Pros", "Transparent Pricing", f"Local {c_clean} Service"]
+        client_label = "Customers"
 
     return {
         "accent_color": accent,
@@ -350,6 +397,9 @@ def resolve_category_design(category: str, business_name: str, city: str) -> Dic
         "hero_image": niche.get("hero_img", "https://images.unsplash.com/photo-1632759145351-1d592919f522?auto=format&fit=crop&w=1600&q=85"),
         "hero_badge": badge,
         "hero_headline": headline,
+        "hero_desc": desc,
+        "checklist": checklist,
+        "client_label": client_label,
         "pills": pills,
         "services": services_list
     }
@@ -364,69 +414,30 @@ def build_business_profile(lead: Any) -> Dict[str, Any]:
 
     data = lead_to_dict(lead)
 
-    name = safe_string(
-        data.get("name"),
-        "Local Business",
-    )
+    raw_name = safe_string(data.get("name"), "Local Business")
+    raw_city = safe_string(data.get("city"), "Surrey, BC")
 
-    category = safe_string(
-        data.get("category"),
-        "Contractor",
-    )
+    city = clean_city_name(raw_city)
+    name = clean_business_name(raw_name, city=raw_city)
 
-    city = safe_string(
-        data.get("city"),
-        "Surrey, BC",
-    )
+    category = safe_string(data.get("category"), "Contractor")
+    address = safe_string(data.get("address"), "")
+    phone = safe_string(data.get("phone"), "")
+    if not phone or phone.startswith("+91"):
+        phone = "(604) 555-0199"
 
-    address = safe_string(
-        data.get("address"),
-        "",
-    )
-
-    phone = safe_string(
-        data.get("phone"),
-        "",
-    )
-
-    email = safe_string(
-        data.get("email"),
-        "",
-    )
-
-    website = safe_string(
-        data.get("website"),
-        "",
-    )
-
-    website_status = safe_string(
-        data.get("website_status"),
-        "",
-    )
-
-    rating = safe_float(
-        data.get("rating"),
-        0,
-    )
-
-    reviews = safe_int(
-        data.get("reviews_count"),
-        0,
-    )
-
-    score = safe_float(
-        data.get("score"),
-        0,
-    )
-
-    tier = safe_string(
-        data.get("lead_tier"),
-        "COLD",
-    ).upper()
-
-    qualified = bool(
-        data.get("qualified")
-    )
+    email = safe_string(data.get("email"), "")
+    website = safe_string(data.get("website"), "")
+    website_status = safe_string(data.get("website_status"), "")
+    rating = safe_float(data.get("rating"), 4.9)
+    if rating == 0:
+        rating = 4.9
+    reviews = safe_int(data.get("reviews_count"), 48)
+    if reviews == 0:
+        reviews = 48
+    score = safe_float(data.get("score"), 85.0)
+    tier = safe_string(data.get("lead_tier"), "HOT").upper()
+    qualified = bool(data.get("qualified", True))
 
     business_type = "local business"
     category_lower = category.lower()
@@ -471,8 +482,6 @@ def build_business_profile(lead: Any) -> Dict[str, Any]:
         business_type = category
 
     cat_design = resolve_category_design(category, name, city)
-    services = cat_design["services"]
-    service_area = city or "Local Area"
 
     return {
         "id": data.get("id"),
@@ -493,121 +502,18 @@ def build_business_profile(lead: Any) -> Dict[str, Any]:
         "lead_tier": tier,
         "tier": tier,
         "qualified": qualified,
-        "services": services,
-        "service_area": service_area,
+        "services": cat_design["services"],
+        "service_area": city,
         "accent_color": cat_design["accent_color"],
         "accent_dark": cat_design["accent_dark"],
         "hero_image": cat_design["hero_image"],
         "hero_badge": cat_design["hero_badge"],
         "hero_headline": cat_design["hero_headline"],
+        "hero_desc": cat_design["hero_desc"],
+        "checklist": cat_design["checklist"],
+        "client_label": cat_design["client_label"],
         "pills": cat_design["pills"],
         "cta": f"Get a Free {business_type.title()} Quote",
-    }
-
-    return {
-        "id": data.get("id"),
-
-        "name": name,
-
-        "business_name": name,
-
-        "business_type": business_type,
-
-        "category": category,
-
-        "city": city,
-
-        "address": address,
-
-        "phone": phone,
-
-        "email": email,
-
-        "website": website,
-
-        "website_status": website_status,
-
-        "website_verified": bool(
-            data.get("website_verified")
-        ),
-
-        "rating": rating,
-
-        "reviews": reviews,
-
-        "reviews_count": reviews,
-
-        "score": score,
-
-        "lead_tier": tier,
-
-        "tier": tier,
-
-        "qualified": qualified,
-
-        "qualification_notes": safe_string(
-            data.get("qualification_notes")
-        ),
-
-        "services": services,
-
-        "service_area": service_area,
-
-        "target_customers": [
-            "Homeowners",
-            "Property Owners",
-            "Property Managers",
-            "Commercial Customers",
-        ],
-
-        "goal": (
-            f"Generate more {business_type} "
-            f"enquiries and quote requests in {city}."
-        ),
-
-        "cta": (
-            "Get a Free Roofing Quote"
-            if "roof" in category_lower
-            else f"Get a Free {business_type.title()} Quote"
-        ),
-
-        "email_subject": safe_string(
-            data.get("email_subject")
-        ),
-
-        "email_message": safe_string(
-            data.get("email_message")
-        ),
-
-        "whatsapp_message": safe_string(
-            data.get("whatsapp_message")
-        ),
-
-        "personalized_message": safe_string(
-            data.get("personalized_message")
-        ),
-
-        "demo_url": safe_string(
-            data.get("demo_url")
-        ),
-
-        "demo_status": safe_string(
-            data.get("demo_status")
-        ),
-
-        "seo_health": safe_float(
-            data.get("seo_health_score"),
-            60,
-        ),
-
-        "site_profile": data.get(
-            "site_profile"
-        ) or {},
-
-        "seo": data.get(
-            "seo"
-        ) or {},
-
         "sections": [
             "Hero",
             "Services",
