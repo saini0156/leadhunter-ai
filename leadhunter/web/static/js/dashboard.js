@@ -303,6 +303,22 @@ async function toggleDryRun() {
     }
 }
 
+function getCleanDemoLink(l) {
+    if (!l) return '/preview';
+    const raw = (typeof l === 'string' ? l : (l.demo_url || '')).trim();
+    if (raw.includes('/preview/')) {
+        return '/preview/' + raw.split('/preview/')[1];
+    }
+    if (raw.includes('/preview?')) {
+        return '/preview?' + raw.split('/preview?')[1];
+    }
+    const leadId = typeof l === 'object' ? (l.id || l.lead_id) : null;
+    if (leadId) {
+        return `/preview?lead_id=${leadId}`;
+    }
+    return '/preview';
+}
+
 // Load Approval Queue
 async function loadApprovalQueue() {
     const container = document.getElementById("approvalQueueContainer");
@@ -320,7 +336,7 @@ async function loadApprovalQueue() {
         container.innerHTML = leads.map(l => {
             const leadName = l.name || l.business_name || 'Prospect';
             const leadId = l.lead_id || l.id;
-            const demoUrl = l.demo_url || '';
+            const demoUrl = getCleanDemoLink(l);
             return `
             <div class="approval-card">
                 <div class="approval-header">
@@ -470,7 +486,7 @@ function renderHotProspects(leads) {
     }
 
     list.innerHTML = hotLeads.map(l => {
-        const demoLink = l.demo_url ? (l.demo_url.includes('/preview/') ? ('/preview/' + l.demo_url.split('/preview/')[1]) : l.demo_url) : ('/preview/' + l.id);
+        const demoLink = getCleanDemoLink(l);
         return `
         <div class="compact-lead-card" style="cursor: pointer;" onclick="openDemoModal('${demoLink}', '${escapeQuotes(l.name)}')">
             <div>
@@ -499,7 +515,7 @@ function renderLeadsTable(leads) {
     }
 
     tbody.innerHTML = leads.map((l, index) => {
-        const demoLink = l.demo_url ? (l.demo_url.includes('/preview/') ? ('/preview/' + l.demo_url.split('/preview/')[1]) : l.demo_url) : ('/preview/' + l.id);
+        const demoLink = getCleanDemoLink(l);
         const isChecked = selectedLeadIds.has(l.id);
         return `
         <tr class="${isChecked ? 'row-selected' : ''}">
